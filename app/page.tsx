@@ -100,7 +100,7 @@ export default function AutoDealerLanding() {
       </header>
 
       {/* Main Content */}
-      <div className="relative z-10 flex-1 pt-16 px-28">
+      <div className="relative z-10 flex-1 px-28">
         <div>
           <div className="flex gap-56 items-center min-h-[calc(100vh-200px)]">
             {/* Left Content */}
