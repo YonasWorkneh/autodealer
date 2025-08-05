@@ -179,7 +179,7 @@ export default function AutoDealerLanding() {
           >
             <ArrowDown size={18} className="text-white/70" />
           </motion.div>
-          <div className="text-white/70 text-sm mt-2">Scroll Down</div>
+          <div className="text-white/70 text-sm mt-4">Scroll Down</div>
         </div>
       </div>
     </div>
