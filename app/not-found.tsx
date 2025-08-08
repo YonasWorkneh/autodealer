@@ -4,28 +4,14 @@ import { Button } from "@/components/ui/button";
 
 export default function Page() {
   return (
-    <main className="relative min-h-screen w-full overflow-hidden">
+    <main className="relative h-screen w-full overflow-hidden">
       {/* Background gradient */}
       <div
         className="absolute inset-0 bg-gradient-to-b from-white via-zinc-100 to-zinc-300"
         aria-hidden="true"
       />
-      {/* Faint skyline band */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-[34%] z-0 w-[1400px] -translate-x-1/2 opacity-50"
-        aria-hidden="true"
-      >
-        {/* <Image
-          src="/bg.webp"
-          alt=""
-          width={1400}
-          height={350}
-          className="h-auto w-full"
-          priority
-        /> */}
-      </div>
       {/* Content */}
-      <section className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-6 pt-6 md:pt-2">
+      <section className="relative z-10 mx-auto flex max-w-5xl h-full  flex-col items-center justify-center px-6 pt-6 md:pt-2">
         {/* 404 with tire */}
         <div className="relative mt-6 flex items-end justify-center gap-3 select-none">
           <span
@@ -75,7 +61,7 @@ export default function Page() {
         <div className="mt-8">
           <Button
             asChild
-            className="rounded-md bg-zinc-800 px-6 py-5 text-base font-semibold tracking-wide text-white hover:bg-zinc-900"
+            className="rounded-full bg-zinc-800 px-6 py-5 text-base font-semibold tracking-wide text-white hover:bg-zinc-900"
           >
             <Link href="/">BACK TO HOMEPAGE</Link>
           </Button>

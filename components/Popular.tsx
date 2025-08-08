@@ -29,7 +29,7 @@ export default function Popular() {
       selectedColor: 0,
     },
     {
-      id: "dz",
+      id: "dza",
       title: "Dzire",
       backgroundTitle: "Suzuki",
       km: 10535,
@@ -51,6 +51,17 @@ export default function Popular() {
       selectedColor: 1,
     },
     {
+      id: "mercedes-glaa",
+      title: "BYD-SONG",
+      backgroundTitle: "BYD",
+      km: 0,
+      transmission: "Automatic",
+      price: 4_900_000,
+      image: "/byd-song.png",
+      colors: [],
+      selectedColor: 0,
+    },
+    {
       id: "v8",
       title: "Toyota-v8",
       backgroundTitle: "Toyota",
@@ -69,6 +80,17 @@ export default function Popular() {
       transmission: "Manual/Automatic",
       price: 18_400_000,
       image: "/niss.png",
+      colors: [],
+      selectedColor: 1,
+    },
+    {
+      id: "dz",
+      title: "Dzire",
+      backgroundTitle: "Suzuki",
+      km: 10535,
+      transmission: "Automatic",
+      price: 2_040_000,
+      image: "/dzire.webp",
       colors: [],
       selectedColor: 1,
     },
@@ -114,7 +136,7 @@ export default function Popular() {
         <div className="flex items-center ml-10">
           <Link
             href={"/search"}
-            className="group h-[50px] bg-[#121212] hover:bg-black rounded-md text-white p-2 w-fit cursor-pointer flex gap-2 items-center px-4"
+            className="group h-[50px] bg-zinc-800 hover:bg-zinc-900 rounded-md text-white p-2 w-fit cursor-pointer flex gap-2 items-center px-4"
           >
             <span>View more</span>
             <ArrowUpRight className="group-hover:mb-2 transition" />

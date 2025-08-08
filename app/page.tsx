@@ -13,8 +13,28 @@ import {
 import { motion } from "framer-motion";
 import About from "@/components/About";
 import Popular from "@/components/Popular";
+import Slider from "@/components/Slider";
+import GetApp from "@/components/GetApp";
+import Footer from "@/components/Footer";
 
 export default function AutoDealerLanding() {
+  const carLogos = [
+    { image: "/logo/byd.webp", title: "BYD" },
+    { image: "/logo/hyundai.webp", title: "Hyundai" },
+    { image: "/logo/Jetour_Logo.svg", title: "Jetour" },
+    { image: "/logo/liffan.png", title: "Lifan" },
+    { image: "/logo/suzuki.png", title: "Suzuki" },
+    { image: "/logo/toyota.png", title: "Toyota" },
+    { image: "/logo/vk.svg.png", title: "VK" },
+    { image: "/logo/nissan.png", title: "Nissan" },
+    { image: "/logo/ford.webp", title: "Ford" },
+    { image: "/logo/audi.png", title: "Audi" },
+    { image: "/logo/mist.png", title: "Mitsubishi" },
+    { image: "/logo/bmw.png", title: "BMW" },
+    { image: "/logo/infinity.png", title: "Infinity" },
+    { image: "/logo/mercedes.webp", title: "Mercedes" },
+    { image: "/logo/lexus.png", title: "Lexus" },
+  ];
   return (
     <div>
       <div className="min-h-screen relative overflow-hidden">
@@ -192,6 +212,11 @@ export default function AutoDealerLanding() {
       </div>
       <About />
       <Popular />
+      <GetApp />
+      <div className="px-40 pb-40">
+        <Slider items={carLogos} />
+      </div>
+      <Footer />
     </div>
   );
 }
