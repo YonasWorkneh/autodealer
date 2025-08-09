@@ -28,7 +28,7 @@ export default function AutoDealerLanding() {
     { image: "/logo/vk.svg.png", title: "VK" },
     { image: "/logo/nissan.png", title: "Nissan" },
     { image: "/logo/ford.webp", title: "Ford" },
-    { image: "/logo/audi.png", title: "Audi" },
+    // { image: "/logo/audi.png", title: "Audi" },
     { image: "/logo/mist.png", title: "Mitsubishi" },
     { image: "/logo/bmw.png", title: "BMW" },
     { image: "/logo/infinity.png", title: "Infinity" },

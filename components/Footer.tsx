@@ -1,127 +1,108 @@
-"use client";
-
-import {
-  Phone,
-  Mail,
-  MapPin,
-  Send,
-  Facebook,
-  Instagram,
-  Twitter,
-} from "lucide-react";
+// components/Footer.tsx
+import Image from "next/image";
 import Link from "next/link";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 
 export default function Footer() {
-  const contact = {
-    phoneDisplay: "+251 911 13 50 90",
-    phoneHref: "+251911135090",
-    email: "sales@proximaauto.com",
-    addressLine1: "22, (2Q6M+H8 Addis",
-    addressLine2: "Ababa Ethiopia)",
-    mapsQuery: "22 Atlas Bole Addis Ababa Ethiopia",
-  };
-
-  const socials = [
-    { name: "Telegram", href: "https://t.me/", icon: Send },
-    { name: "Facebook", href: "https://facebook.com/", icon: Facebook },
-    { name: "Instagram", href: "https://instagram.com/", icon: Instagram },
-    { name: "Twitter", href: "https://twitter.com/", icon: Twitter },
-  ];
-
   return (
-    <footer className="bg-neutral-900 text-white">
-      <div className="mx-auto w-full max-w-6xl px-6 py-16">
-        <div className="grid gap-8 md:grid-cols-12">
-          <div className="md:col-span-6 lg:col-span-7">
-            <h2 className="text-xl font-semibold tracking-wide">Contact</h2>
+    <footer className="bg-black text-white py-10 px-6 md:px-16">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 border-b border-gray-700 pb-8">
+        {/* Logo & Description */}
+        <div>
+          <Link href="/" className="flex items-center space-x-3">
+            <Image
+              src="/wheel copy.png"
+              alt="Car Dealer Logo"
+              width={40}
+              height={40}
+            />
+            <span className="text-xl font-bold">AUTO&mdash;DEALER</span>
+          </Link>
+          <p className="mt-4 text-gray-400 text-sm">
+            Premium cars. Exceptional service. Your trusted dealership for the
+            perfect ride.
+          </p>
+        </div>
 
-            <ul className="mt-8 space-y-6">
-              <li className="flex items-center gap-4">
-                <span
-                  aria-hidden="true"
-                  className="mt-1 rounded-lg bg-white/5 p-2 ring-1 ring-white/10"
-                >
-                  <Phone className="size-5" />
-                </span>
-                <div>
-                  <Link
-                    href={`tel:${contact.phoneHref}`}
-                    className="text-lg hover:underline underline-offset-4"
-                    aria-label={"Call " + contact.phoneDisplay}
-                  >
-                    {contact.phoneDisplay}
-                  </Link>
-                </div>
-              </li>
+        {/* Quick Links */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+          <ul className="space-y-2 text-gray-400 text-sm">
+            <li>
+              <Link href="/inventory" className="hover:text-white">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link href="/about" className="hover:text-white">
+                Search
+              </Link>
+            </li>
+            <li>
+              <Link href="/services" className="hover:text-white">
+                Favourites
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="hover:text-white">
+                Sell my Car
+              </Link>
+            </li>
+          </ul>
+        </div>
 
-              <li className="flex items-center gap-4">
-                <span
-                  aria-hidden="true"
-                  className="mt-1 rounded-lg bg-white/5 p-2 ring-1 ring-white/10"
-                >
-                  <Mail className="size-5" />
-                </span>
-                <div>
-                  <Link
-                    href={`mailto:${contact.email}`}
-                    className="text-lg hover:underline underline-offset-4 break-all"
-                    aria-label={"Email " + contact.email}
-                  >
-                    {contact.email}
-                  </Link>
-                </div>
-              </li>
+        {/* Services */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Services</h3>
+          <ul className="space-y-2 text-gray-400 text-sm">
+            <li>
+              <Link href="/trade-in" className="hover:text-white">
+                Trade-In
+              </Link>
+            </li>
+            <li>
+              <Link href="/test-drive" className="hover:text-white">
+                Book a Test Drive
+              </Link>
+            </li>
+            <li>
+              <Link href="/repairs" className="hover:text-white">
+                Sell your car
+              </Link>
+            </li>
+          </ul>
+        </div>
 
-              <li className="flex items-center gap-4">
-                <span
-                  aria-hidden="true"
-                  className="mt-1 rounded-lg bg-white/5 p-2 ring-1 ring-white/10"
-                >
-                  <MapPin className="size-5" />
-                </span>
-                <address className="not-italic text-lg">
-                  <Link
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      contact.mapsQuery
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline underline-offset-4"
-                    aria-label={"Open address in Google Maps"}
-                  >
-                    {contact.addressLine1} {contact.addressLine2}
-                  </Link>
-                </address>
-              </li>
-            </ul>
+        {/* Contact Info */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Contact</h3>
+          <p className="text-gray-400 text-sm">
+            123 Main Street, Addis Ababa, Ethiopia
+          </p>
+          <p className="text-gray-400 text-sm">Email: info@drivexmotors.com</p>
+          <p className="text-gray-400 text-sm">Phone: +251 900 123 456</p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
-              {socials.map(({ name, href, icon: Icon }) => (
-                <Link
-                  key={name}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex size-[44px] items-center justify-center rounded-full ring-1 ring-white/60 transition hover:ring-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-                  aria-label={name}
-                >
-                  <Icon className="size-5 text-white transition group-hover:scale-110" />
-                </Link>
-              ))}
-            </div>
+          {/* Socials */}
+          <div className="flex space-x-4 mt-4">
+            <Link href="#" className="hover:text-white">
+              <Facebook size={20} />
+            </Link>
+            <Link href="#" className="hover:text-white">
+              <Instagram size={20} />
+            </Link>
+            <Link href="#" className="hover:text-white">
+              <Twitter size={20} />
+            </Link>
           </div>
-
-          {/* Spacer column to approximate screenshot layout (content shifted right) */}
-          <div className="hidden md:col-span-6 lg:col-span-5 md:block" />
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto w-full max-w-6xl px-6">
-          <div className="flex items-center justify-center py-6 text-sm text-white/80">
-            <p>{"©" + new Date().getFullYear()} all rights reserved.</p>
-          </div>
-        </div>
+      {/* Bottom Bar */}
+      <div className="mt-6 flex flex-col md:flex-row justify-center items-center text-gray-500 text-sm">
+        <p>
+          © {new Date().getFullYear()} Auto&mdash;Dealer. All rights reserved.
+        </p>
+        {/* <p>Designed with ❤️ by DriveX Motors</p> */}
       </div>
     </footer>
   );
