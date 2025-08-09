@@ -4,6 +4,7 @@ import { CardContent } from "@/components/ui/card";
 import { Gauge, Settings } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 type Props = {
   title: string;
@@ -32,7 +33,7 @@ export default function CarCard({
     new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
 
   return (
-    <div className="flex h-full flex-col">
+    <Link href={"#"} className="flex h-full flex-col">
       <div className="relative h-[190px] w-full">
         {/* Watermark model name */}
         <div className="absolute inset-0 flex items-start justify-center pt-6">
@@ -96,6 +97,6 @@ export default function CarCard({
           </div>
         </div>
       </CardContent>
-    </div>
+    </Link>
   );
 }

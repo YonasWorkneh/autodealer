@@ -5,8 +5,8 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white py-10 px-6 md:px-16">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 border-b border-gray-700 pb-8">
+    <footer className="bg-black text-white py-10 px-6 md:px-40">
+      <div className=" grid grid-cols-1 md:grid-cols-4 gap-8 border-b border-gray-700 pb-8">
         {/* Logo & Description */}
         <div>
           <Link href="/" className="flex items-center space-x-3">
@@ -20,7 +20,7 @@ export default function Footer() {
           </Link>
           <p className="mt-4 text-gray-400 text-sm">
             Premium cars. Exceptional service. Your trusted dealership for the
-            perfect ride.
+            perfect automobile.
           </p>
         </div>
 

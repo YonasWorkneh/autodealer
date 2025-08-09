@@ -15,7 +15,7 @@ export default function GetApp() {
             Get our top rated app !
           </p>
           <p className="mt-4 mb-4 text-xl">
-            Over <span className="underline">1000</span> downloads
+            Over <span className="underline">1000+</span> downloads
           </p>
           <div className="flex gap-2 items-center -ml-[10px] mt-10 ">
             <Link href={"#"}>
