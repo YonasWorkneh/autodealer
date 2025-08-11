@@ -3,7 +3,15 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, ChevronDown, Menu, ArrowRight, ArrowDown } from "lucide-react";
+import {
+  Search,
+  ChevronDown,
+  Menu,
+  ArrowRight,
+  ArrowDown,
+  UserCircle,
+  Heart,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +24,7 @@ import Popular from "@/components/Popular";
 import Slider from "@/components/Slider";
 import GetApp from "@/components/GetApp";
 import Footer from "@/components/Footer";
+import Link from "next/link";
 
 export default function AutoDealerLanding() {
   const carLogos = [
@@ -28,7 +37,7 @@ export default function AutoDealerLanding() {
     { image: "/logo/vk.svg.png", title: "VK" },
     { image: "/logo/nissan.png", title: "Nissan" },
     { image: "/logo/ford.webp", title: "Ford" },
-    // { image: "/logo/audi.png", title: "Audi" },
+    { image: "/logo/audi.png", title: "Audi" },
     { image: "/logo/mist.png", title: "Mitsubishi" },
     { image: "/logo/bmw.png", title: "BMW" },
     { image: "/logo/infinity.png", title: "Infinity" },
@@ -67,30 +76,7 @@ export default function AutoDealerLanding() {
             </span>
           </div>
 
-          <div className="flex items-center space-x-6 w-[600px]">
-            <div className="flex items-center space-x-1 text-white cursor-pointer w-[150px]">
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center space-x-1 text-white cursor-pointer hover:text-white/80 transition-colors">
-                  <span>All Models</span>
-                  <ChevronDown className="w-4 h-4" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-black/30 backdrop-blur-sm border-white/20 w-[150px] p-4 px-2 rounded-md">
-                  <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md">
-                    BYD
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md">
-                    V8
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md">
-                    Nissan
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md">
-                    Toyota
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
+          <div className="flex items-center space-x-6 w-[850px]">
             <div className="relative">
               <Input
                 placeholder="Search..."
@@ -98,27 +84,21 @@ export default function AutoDealerLanding() {
               />
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/70" />
             </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center space-x-1 bg-white/10 px-3 py-2 rounded cursor-pointer transition-colors">
-                <span className="text-white">USD</span>
-                <ChevronDown className="w-4 h-4 text-white" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black/30 backdrop-blur-sm border-white/20 w-[150px] p-4 px-2 mt-1 rounded-md">
-                <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md text-white ">
-                  Birr
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md text-white ">
-                  Dollar
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md text-white ">
-                  Pound
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer hover:bg-black/20 p-2 rounded-md text-white ">
-                  Euro
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Link
+              href={"/car-list"}
+              className=" text-white hover:text-white/80 p-2 px-4 rounded-md cursor-pointer"
+            >
+              All-listing
+            </Link>{" "}
+            <Link
+              href={"/favorites"}
+              className="text-white hover:text-white/80 p-2 px-4 rounded-md cursor-pointer"
+            >
+              Favourites
+            </Link>
+            <button className="bg-white/10 hover:bg-white/20 text-white p-2 px-4 rounded-md cursor-pointer">
+              Sell my Car
+            </button>
           </div>
         </header>
 
