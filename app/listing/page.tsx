@@ -15,6 +15,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
+import Link from "next/link";
 
 export default function CarMarketplace() {
   const [headerVisible, setHeaderVisible] = useState(true);
@@ -252,69 +253,72 @@ export default function CarMarketplace() {
               {/* Car Listings */}
               <div className="space-y-4">
                 {cars.map((car) => (
-                  <Card
+                  <Link
+                    href={"/listing/gibberish"}
+                    className="cursor-pointer"
                     key={car.id}
-                    className="border-gray-200 hover:shadow-lg transition-shadow cursor-pointer"
                   >
-                    <CardContent className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        {/* Car Image */}
-                        <div className="relative">
-                          <img
-                            src={car.image || "/placeholder.svg"}
-                            alt={`${car.year} ${car.make} ${car.model}`}
-                            className="w-full h-40 object-cover rounded-lg"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                          >
-                            <Heart className="h-4 w-4" />
-                          </Button>
-                        </div>
+                    <Card className="border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
+                      <CardContent className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                          {/* Car Image */}
+                          <div className="relative">
+                            <img
+                              src={car.image || "/placeholder.svg"}
+                              alt={`${car.year} ${car.make} ${car.model}`}
+                              className="w-full h-40 object-cover rounded-lg"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                            >
+                              <Heart className="h-4 w-4" />
+                            </Button>
+                          </div>
 
-                        {/* Car Details */}
-                        <div className="md:col-span-2">
-                          <h3 className="text-xl font-semibold text-black mb-2">
-                            {car.year} {car.make} {car.model}
-                          </h3>
-                          <p className="text-gray-600 mb-1">{car.mileage}</p>
-                          <p className="text-gray-600 mb-3">{car.location}</p>
+                          {/* Car Details */}
+                          <div className="md:col-span-2">
+                            <h3 className="text-xl font-semibold text-black mb-2">
+                              {car.year} {car.make} {car.model}
+                            </h3>
+                            <p className="text-gray-600 mb-1">{car.mileage}</p>
+                            <p className="text-gray-600 mb-3">{car.location}</p>
 
-                          {car.percentLess && (
-                            <div className="flex items-center space-x-2 mb-2">
-                              <Badge
-                                variant="secondary"
-                                className="bg-green-100 text-green-800"
-                              >
-                                {car.percentLess}
-                              </Badge>
-                            </div>
-                          )}
+                            {car.percentLess && (
+                              <div className="flex items-center space-x-2 mb-2">
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-green-100 text-green-800"
+                                >
+                                  {car.percentLess}
+                                </Badge>
+                              </div>
+                            )}
 
-                          <p className="text-sm text-gray-600">
-                            {car.daysOnMarket} days on market
-                          </p>
-                        </div>
-
-                        {/* Price & Action */}
-                        <div className="flex flex-col justify-between items-end">
-                          <div className="text-right">
-                            <p className="text-2xl font-bold text-black">
-                              {car.price}
-                            </p>
                             <p className="text-sm text-gray-600">
-                              est. {car.monthlyEst}
+                              {car.daysOnMarket} days on market
                             </p>
                           </div>
-                          <Button className="bg-black text-white hover:bg-gray-800 mt-4 cursor-pointer">
-                            Request Info
-                          </Button>
+
+                          {/* Price & Action */}
+                          <div className="flex flex-col justify-between items-end">
+                            <div className="text-right">
+                              <p className="text-2xl font-bold text-black">
+                                {car.price}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                est. {car.monthlyEst}
+                              </p>
+                            </div>
+                            <Button className="bg-black text-white hover:bg-gray-800 mt-4 cursor-pointer">
+                              Request Info
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>
