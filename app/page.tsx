@@ -25,6 +25,7 @@ import Slider from "@/components/Slider";
 import GetApp from "@/components/GetApp";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import Header from "@/components/Header";
 
 export default function AutoDealerLanding() {
   const carLogos = [
@@ -60,47 +61,7 @@ export default function AutoDealerLanding() {
         </div>
 
         {/* Header */}
-        <header className="relative z-10 flex items-center justify-between px-40 py-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center">
-              <Image
-                src="/wheel copy.png"
-                alt="wheel"
-                width={100}
-                height={100}
-                className="w-full h-full"
-              />
-            </div>
-            <span className="text-white text-xl font-semibold">
-              AUTO&mdash;DEALER
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-6 w-[850px]">
-            <div className="relative">
-              <Input
-                placeholder="Search..."
-                className="w-64 bg-white/10 border-white/20 text-white placeholder:text-white/70 pr-10"
-              />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/70" />
-            </div>
-            <Link
-              href={"/car-list"}
-              className=" text-white hover:text-white/80 p-2 px-4 rounded-md cursor-pointer"
-            >
-              All-listing
-            </Link>{" "}
-            <Link
-              href={"/favorites"}
-              className="text-white hover:text-white/80 p-2 px-4 rounded-md cursor-pointer"
-            >
-              Favourites
-            </Link>
-            <button className="bg-white/10 hover:bg-white/20 text-white p-2 px-4 rounded-md cursor-pointer">
-              Sell my Car
-            </button>
-          </div>
-        </header>
+        <Header />
 
         {/* Main Content */}
         <div className="relative z-10 flex-1 px-40">

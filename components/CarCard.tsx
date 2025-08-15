@@ -15,6 +15,7 @@ type Props = {
   image: string;
   colors: string[];
   selectedColor?: number;
+  href: string;
 };
 
 export default function CarCard({
@@ -26,6 +27,7 @@ export default function CarCard({
   image,
   colors,
   selectedColor = 0,
+  href,
 }: Props) {
   const [activeColor, setActiveColor] = useState(selectedColor);
 
@@ -33,7 +35,7 @@ export default function CarCard({
     new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
 
   return (
-    <Link href={"#"} className="flex h-full flex-col">
+    <Link href={href} className="flex h-full flex-col">
       <div className="relative h-[190px] w-full">
         {/* Watermark model name */}
         <div className="absolute inset-0 flex items-start justify-center pt-6">

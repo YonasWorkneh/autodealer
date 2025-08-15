@@ -130,6 +130,7 @@ export default function Popular() {
               image={car.image}
               colors={car.colors}
               selectedColor={car.selectedColor}
+              href="/listing/gibberish"
             />
           </Card>
         ))}
