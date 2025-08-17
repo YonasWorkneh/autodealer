@@ -101,22 +101,6 @@ export default function SignIn() {
             type="submit"
             className="w-full cursor-pointer"
             disabled={loading}
-            onClick={async () => {
-              await signIn.email(
-                {
-                  email,
-                  password,
-                },
-                {
-                  onRequest: (ctx) => {
-                    setLoading(true);
-                  },
-                  onResponse: (ctx) => {
-                    setLoading(false);
-                  },
-                }
-              );
-            }}
           >
             {loading ? (
               <Loader2 size={16} className="animate-spin" />
@@ -135,22 +119,6 @@ export default function SignIn() {
               variant="outline"
               className={cn("w-full gap-2 cursor-pointer")}
               disabled={loading}
-              onClick={async () => {
-                await signIn.social(
-                  {
-                    provider: "google",
-                    callbackURL: "/dashboard",
-                  },
-                  {
-                    onRequest: (ctx) => {
-                      setLoading(true);
-                    },
-                    onResponse: (ctx) => {
-                      setLoading(false);
-                    },
-                  }
-                );
-              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

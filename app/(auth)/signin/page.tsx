@@ -13,8 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Loader2, Key } from "lucide-react";
-import { signIn } from "@/lib/auth-client";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -93,22 +92,6 @@ export default function SignIn() {
             type="submit"
             className="w-full cursor-pointer"
             disabled={loading}
-            onClick={async () => {
-              await signIn.email(
-                {
-                  email,
-                  password,
-                },
-                {
-                  onRequest: (ctx) => {
-                    setLoading(true);
-                  },
-                  onResponse: (ctx) => {
-                    setLoading(false);
-                  },
-                }
-              );
-            }}
           >
             {loading ? (
               <Loader2 size={16} className="animate-spin" />
@@ -127,22 +110,6 @@ export default function SignIn() {
               variant="outline"
               className={cn("w-full gap-2 cursor-pointer")}
               disabled={loading}
-              onClick={async () => {
-                await signIn.social(
-                  {
-                    provider: "google",
-                    callbackURL: "/dashboard",
-                  },
-                  {
-                    onRequest: (ctx) => {
-                      setLoading(true);
-                    },
-                    onResponse: (ctx) => {
-                      setLoading(false);
-                    },
-                  }
-                );
-              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
