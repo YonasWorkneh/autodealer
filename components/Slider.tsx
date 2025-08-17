@@ -34,7 +34,7 @@ export default function Slider({ items, speed = 30 }: SliderProps) {
               key={idx}
               className="flex-shrink-0 w-80 flex flex-col items-center"
             >
-              <div className="w-36 h-20 relative">
+              <div className="w-28 h-20 relative">
                 <Image
                   src={item.image}
                   alt={item.title}
@@ -56,12 +56,12 @@ export default function Slider({ items, speed = 30 }: SliderProps) {
               key={idx}
               className="flex-shrink-0 w-80 flex flex-col items-center"
             >
-              <div className="w-36 h-20 relative">
+              <div className="w-28 h-20 relative">
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
-                  className="rounded-lg"
+                  className="rounded-lg h-full w-full"
                 />
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function Slider({ items, speed = 30 }: SliderProps) {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-100%); 
+            transform: translateX(-100%);
           }
         }
         .animate-slide {

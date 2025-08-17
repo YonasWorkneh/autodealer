@@ -16,10 +16,12 @@ import { Slider } from "@/components/ui/slider";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
+import { CarDetailModal } from "./CarDetailModal";
 
 export default function CarMarketplace() {
   const [headerVisible, setHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [detailOpened, setDetailOpened] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -255,10 +257,22 @@ export default function CarMarketplace() {
                 {cars.map((car) => (
                   <Link
                     href={"/listing/gibberish"}
-                    className="cursor-pointer"
+                    className="cursor-pointer relative"
                     key={car.id}
                   >
-                    <Card className="border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
+                    {/* right side icon */}
+                    <div
+                      className="flex flex-col gap-1 absolute top-[calc(50%-20px)] right-[-10px] border rounded-2xl p-[6px] z-10 bg-white cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setDetailOpened(true);
+                      }}
+                    >
+                      <span className="p-[3px] bg-black/30 rounded-full"></span>
+                      <span className="p-[3px] bg-black/30 rounded-full"></span>
+                      <span className="p-[3px] bg-black/30 rounded-full"></span>
+                    </div>
+                    <Card className="border-gray-200 hover:shadow-lg transition-shadow cursor-pointer mb-5">
                       <CardContent className="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                           {/* Car Image */}
@@ -325,6 +339,32 @@ export default function CarMarketplace() {
           </div>
         </div>
       </div>
+      {detailOpened && (
+        <CarDetailModal
+          isOpen={detailOpened}
+          car={{
+            id: "string",
+            year: 2022,
+            make: "Volkswagen",
+            model: "ID6",
+            trim: "SV",
+            price: 4_000_000,
+            monthlyPayment: 200_000,
+            image: "/id6-orange.png",
+            mileage: 0,
+            transmission: "Automatic",
+            drivetrain: "AWD",
+            mpg: "",
+            exteriorColor: "Orange",
+            interiorColor: "White",
+            fuelType: "",
+            bodyStyle: "SUV",
+            doors: 4,
+            vin: "KNMAT2MV0HP518223",
+          }}
+          onClose={() => setDetailOpened(false)}
+        />
+      )}
     </div>
   );
 }

@@ -5,10 +5,11 @@ import React from "react";
 export default function About() {
   return (
     <div className="min-h-screen px-40 py-20">
-      <h1 className="text-xl flex items-center gap-2">
-        <span className="inline-block size-3 bg-black rounded-full"></span>
-        <span>About us </span>
-      </h1>
+      <div className="flex justify-center mb-10">
+        <h1 className="text-xl text-center w-fit after:content-[''] after:inline-block after:w-[100px] after:absolute after:right-[-120px] after:top-[15px] after:border after:h-[1px] before:content-[''] before:inline-block before:w-[100px] before:absolute before:left-[-120px] before:top-[15px] before:border before:h-[1px] before:border-black/20 after:border-black/20 relative uppercase">
+          About us
+        </h1>
+      </div>
       <div className="grid grid-cols-[3fr_1fr]">
         <h2 className="text-5xl mt-10 w-fit">
           Instant, accurate, and reliable dealership <br /> of any vehicle you

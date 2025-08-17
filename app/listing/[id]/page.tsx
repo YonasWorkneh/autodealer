@@ -32,7 +32,6 @@ export default function CarListingPage() {
   const carImages = [
     "/white-honda-civic-sedan-front.png",
     "/white-honda-civic-sedan-side.png",
-    "/placeholder-1hm4q.png",
     "/white-honda-civic-interior.png",
   ];
 
@@ -67,7 +66,7 @@ export default function CarListingPage() {
         <div className="relative mb-6">
           <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
             <Image
-              src={carImages[currentImageIndex] || "/placeholder.svg"}
+              src={carImages[currentImageIndex]}
               alt="Honda Civic VTi"
               width={120}
               height={120}
@@ -170,7 +169,7 @@ export default function CarListingPage() {
               <CardContent className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Car Overview</h2>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-3">
+                  <div className="space-y-3 border-r pr-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Interior Color</span>
                       <span className="font-medium">Beige</span>
@@ -374,18 +373,18 @@ export default function CarListingPage() {
             {/* Close button */}
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 left-4 z-10 bg-[#111] text-white p-3 rounded-full transition-colors cursor-pointer"
+              className="absolute top-4 left-4 z-10 bg-[#111] hover:bg-[#222] text-white p-3 rounded-full transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* Favorite and Share buttons */}
             <div className="absolute top-4 right-20 z-10 flex gap-4">
-              <button className="flex items-center gap-1 px-3 py-2 text-white bg-[#111] rounded-lg transition-colors cursor-pointer">
+              <button className="flex items-center gap-1 px-3 py-2 text-white bg-[#111] hover:bg-[#222] rounded-lg transition-colors cursor-pointer">
                 <Heart className="w-4 h-4" />
                 Favorite
               </button>
-              <button className="flex items-center gap-1 px-3 py-2 text-white bg-[#111] rounded-lg transition-colors cursor-pointer">
+              <button className="flex items-center gap-1 px-3 py-2 text-white bg-[#111] hover:bg-[#222] rounded-lg transition-colors cursor-pointer">
                 <Share2 className="w-4 h-4" />
                 Share
               </button>
@@ -405,13 +404,13 @@ export default function CarListingPage() {
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#111] text-white p-3 rounded-full transition-colors cursor-pointer"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#111] hover:bg-[#222] text-white p-3 rounded-full transition-colors cursor-pointer"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                   onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#111]  text-white p-3 rounded-full transition-colors cursor-pointer"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#111] hover:bg-[#222]  text-white p-3 rounded-full transition-colors cursor-pointer"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>

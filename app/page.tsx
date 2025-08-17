@@ -131,10 +131,12 @@ export default function AutoDealerLanding() {
                 </Card>
 
                 {/* Explore Button */}
-                <Button className="bg-white/10 cursor-pointer hover:bg-white/20 border border-white/20 text-white backdrop-blur-sm w-full justify-between">
-                  <span>Explore Our Cars</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
+                <Link href={"/listing"}>
+                  <Button className="bg-white/10 cursor-pointer hover:bg-white/20 border border-white/20 text-white backdrop-blur-sm w-full justify-between">
+                    <span>Explore Our Cars</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

@@ -22,6 +22,8 @@ import Image from "next/image";
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fName, setFName] = useState("");
+  const [lName, setLName] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -42,11 +44,33 @@ export default function SignIn() {
         </div>
         <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Enter an email & password to create an account
+          Enter the necessary credentials to create an account .
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2">
+              <Label htmlFor="fname">First Name</Label>
+              <Input
+                id="fname"
+                type="text"
+                placeholder="John"
+                value={fName}
+                onChange={(e) => setFName(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="lname">Last Name</Label>
+              <Input
+                id="lname"
+                type="text"
+                placeholder="Doe"
+                value={lName}
+                onChange={(e) => setLName(e.target.value)}
+              />
+            </div>
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -62,6 +86,7 @@ export default function SignIn() {
           </div>
 
           <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"

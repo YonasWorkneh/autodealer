@@ -1,7 +1,7 @@
 import React from "react";
 import CarCard from "./CarCard";
 import { Card } from "./ui/card";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 export default function Popular() {
@@ -108,10 +108,11 @@ export default function Popular() {
   ];
   return (
     <div className="min-h-screen px-40">
-      <h1 className="text-xl flex items-center gap-2">
-        <span className="inline-block size-3 bg-black rounded-full"></span>
-        <span>Popular Cars</span>
-      </h1>
+      <div className="flex justify-center mb-10">
+        <h1 className="text-xl text-center w-fit after:content-[''] after:inline-block after:w-[100px] after:absolute after:right-[-120px] after:top-[15px] after:border after:h-[1px] before:content-[''] before:inline-block before:w-[100px] before:absolute before:left-[-120px] before:top-[15px] before:border before:h-[1px] before:border-black/20 after:border-black/20 relative uppercase">
+          Popular Cars
+        </h1>
+      </div>
       {/* <p className="text-xl mb-10 mt-2 text-black/60">
         These are some of the popular cars in our site.
       </p> */}
@@ -136,11 +137,11 @@ export default function Popular() {
         ))}
         <div className="flex items-center ml-10">
           <Link
-            href={"/search"}
-            className="group h-[50px] bg-zinc-800 hover:bg-zinc-900 rounded-md text-white p-2 w-fit cursor-pointer flex gap-2 items-center px-4"
+            href={"/listing"}
+            className="group h-[50px] bg-zinc-800 hover:bg-zinc-900 rounded-md text-white p-1 w-fit cursor-pointer flex gap-2 items-center px-3"
           >
             <span>View more</span>
-            <ArrowUpRight className="group-hover:mb-2 transition" />
+            <span className="group-hover:translate-x-1 transition-all">→</span>
           </Link>
         </div>
       </div>

@@ -5,10 +5,11 @@ import React from "react";
 export default function GetApp() {
   return (
     <div className="px-40 py-20 pb-56">
-      <h4 className="text-xl flex items-center gap-2">
-        <span className="inline-block size-3 bg-black rounded-full"></span>
-        <span>Get App</span>
-      </h4>
+      <div className="flex justify-center mb-10">
+        <h1 className="text-xl text-center w-fit after:content-[''] after:inline-block after:w-[100px] after:absolute after:right-[-120px] after:top-[15px] after:border after:h-[1px] before:content-[''] before:inline-block before:w-[100px] before:absolute before:left-[-120px] before:top-[15px] before:border before:h-[1px] before:border-black/20 after:border-black/20 relative uppercase">
+          Get App
+        </h1>
+      </div>
       <div className="flex items-center gap-40 lg:flex-row flex-col mt-10 ">
         <div>
           <p className="text-5xl font-bold text-zinc-800">
