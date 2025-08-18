@@ -13,19 +13,34 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Loader2, Key } from "lucide-react";
-import { signIn } from "@/lib/auth-client";
+import { Loader2, Key, TriangleAlert, EyeOff, Eye } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { signup } from "@/lib/auth/signup";
 
 export default function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fName, setFName] = useState("");
-  const [lName, setLName] = useState("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const { handleSubmit, register, formState } = useForm();
+  const { errors } = formState;
+  const [err, setErr] = useState("");
+
+  const onSubmit = async (data: any) => {
+    try {
+      setLoading(true);
+      setErr("");
+      console.log({ ...data, password2: data.password1 });
+      const user = await signup({ ...data, password2: data.password1 });
+      console.log(user);
+    } catch (err) {
+      setErr("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Card className="w-[450px]">
@@ -48,7 +63,7 @@ export default function SignIn() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <div className="grid grid-cols-2 gap-2">
             <div className="grid gap-2">
               <Label htmlFor="fname">First Name</Label>
@@ -56,9 +71,16 @@ export default function SignIn() {
                 id="fname"
                 type="text"
                 placeholder="John"
-                value={fName}
-                onChange={(e) => setFName(e.target.value)}
+                {...register("first_name", {
+                  required: "First name is required",
+                })}
+                onChange={() => setErr("")}
               />
+              {errors?.first_name && (
+                <p className="text-red-400 text-sm">
+                  {errors.first_name.message as string}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="lname">Last Name</Label>
@@ -66,9 +88,16 @@ export default function SignIn() {
                 id="lname"
                 type="text"
                 placeholder="Doe"
-                value={lName}
-                onChange={(e) => setLName(e.target.value)}
+                {...register("last_name", {
+                  required: "Last name is required",
+                })}
+                onChange={() => setErr("")}
               />
+              {errors?.last_name && (
+                <p className="text-red-400 text-sm">
+                  {errors.last_name.message as string}
+                </p>
+              )}
             </div>
           </div>
           <div className="grid gap-2">
@@ -78,24 +107,51 @@ export default function SignIn() {
               type="email"
               placeholder="m@example.com"
               required
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
-              value={email}
+              {...register("email", {
+                required: "Email is required",
+              })}
+              onChange={() => setErr("")}
             />
+            {errors?.email && (
+              <p className="text-red-400 text-sm">
+                {errors.email?.message as string}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="password"
-              autoComplete="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="password"
+                autoComplete="password"
+                {...register("password1", {
+                  required: "Password is required",
+                })}
+                onChange={() => setErr("")}
+              />
+              <span
+                className="absolute right-5 top-[8px]"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </span>
+            </div>
+            {errors?.password1 && (
+              <p className="text-red-400 text-sm">
+                {errors.password1?.message as string}
+              </p>
+            )}
           </div>
+          {/* err */}
+          {err && (
+            <div className="flex gap-2">
+              <p className="text-red-400 text-sm">{err}</p>
+              <TriangleAlert className="text-red-400" size={18} />
+            </div>
+          )}
 
           <Button
             type="submit"
@@ -146,7 +202,7 @@ export default function SignIn() {
               Sign up with Google
             </Button>
           </div>
-        </div>
+        </form>
       </CardContent>
       <CardFooter>
         <div className="flex justify-center w-full py-4">

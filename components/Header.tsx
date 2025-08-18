@@ -3,12 +3,16 @@ import { Input } from "./ui/input";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useUserStore } from "@/store/user";
+import { toast } from "sonner";
 
 interface HeaderProps {
   color?: string;
 }
 
 export default function Header({ color }: HeaderProps) {
+  const { user } = useUserStore();
+  console.log(user);
   return (
     <header
       className={`relative z-10 flex items-center justify-between px-40 py-4 ${
@@ -34,7 +38,7 @@ export default function Header({ color }: HeaderProps) {
         </span>
       </Link>
 
-      <div className="flex items-center space-x-6 w-[850px]">
+      <div className="flex items-center space-x-6">
         <div className="relative">
           <Input
             placeholder="Search..."
@@ -70,15 +74,45 @@ export default function Header({ color }: HeaderProps) {
         >
           Favourites
         </Link>
-        <button
+        <Link
+          href={user.first_name ? "profile" : "/signin"}
+          className={` ${
+            color === "black"
+              ? "text-black hover:text-black/60"
+              : "text-white hover:text-white/80"
+          }  p-2 px-4 rounded-md cursor-pointer`}
+        >
+          {user.first_name ? (
+            <span
+              className={`${
+                color === "black"
+                  ? "bg-zinc-800 hover:bg-zinc-900 text-white"
+                  : " bg-white/10 hover:bg-white/20"
+              } size-10 flex justify-center items-center rounded-full`}
+            >
+              {user.first_name[0] + user.last_name[0]}
+            </span>
+          ) : (
+            "Signin"
+          )}
+        </Link>
+        <Link
+          href={"/place-add"}
           className={`text-white ${
             color === "black"
               ? " bg-zinc-800 hover:bg-zinc-900"
               : " bg-white/10 hover:bg-white/20"
           } p-2 px-4 rounded-md cursor-pointer`}
+          onClick={(e) => {
+            if (!user.first_name) {
+              console.log("prevented");
+              e.preventDefault();
+              toast.error("Log in or create an account to sell your car.");
+            }
+          }}
         >
           Sell my Car
-        </button>
+        </Link>
       </div>
     </header>
   );
