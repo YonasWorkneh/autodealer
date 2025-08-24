@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "E-Car",
@@ -24,7 +25,10 @@ html {
         `}</style>
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </head>
-      <body>{children}</body>
+      <body>
+        <div className="root">{children}</div>
+        <Toaster/>
+      </body>
     </html>
   );
 }

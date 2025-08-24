@@ -18,7 +18,6 @@ export default function ForgotPasswordForm() {
 
   const onSubmit = async () => {
     try {
-        
     } catch (err: any) {
       setError("email", { message: "Something went wrong. Try again." });
     }
@@ -82,10 +81,10 @@ export default function ForgotPasswordForm() {
 
           {/* Back to login link */}
           <Link
-            href="/login"
+            href="/signin"
             className="text-zinc-600 hover:text-zinc-700 text-sm font-medium"
           >
-            Back to Login
+            Back to Signin
           </Link>
         </div>
       </CardContent>

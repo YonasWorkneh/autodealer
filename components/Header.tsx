@@ -12,7 +12,6 @@ interface HeaderProps {
 
 export default function Header({ color }: HeaderProps) {
   const { user } = useUserStore();
-  console.log(user);
   return (
     <header
       className={`relative z-10 flex items-center justify-between px-40 py-4 ${

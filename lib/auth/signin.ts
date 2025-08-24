@@ -65,13 +65,10 @@ export const getUser = async (id: number) => {
 
 export const forgotPassword = async (email: string) => {
   try {
-    console.log(process.env.BASE_API_URL);
-    const res = await fetch(`${process.env.BASE_API_URL}/auth/password/reset`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    if (!res.ok) throw new Error("Something went wrong");
+    const cookie = await cookies();
+    const access = cookie.get("access");
+    const refresh = cookie.get("refresh");
+    return { access, refresh };
   } catch (err: any) {
     console.error(err.message);
     throw err;
