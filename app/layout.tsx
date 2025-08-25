@@ -3,6 +3,8 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import Session from "./Session";
+import { getUser } from "@/lib/auth/signin";
 
 export const metadata: Metadata = {
   title: "E-Car",
@@ -26,8 +28,10 @@ html {
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body>
-        <div className="root">{children}</div>
-        <Toaster/>
+        <Session>
+          <div className="root">{children}</div>
+        </Session>
+        <Toaster />
       </body>
     </html>
   );

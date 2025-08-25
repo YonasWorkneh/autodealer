@@ -6,9 +6,10 @@ interface SignInParams {
   password: string;
 }
 
+// const refresh =
+
 export const signin = async (data: SignInParams) => {
   try {
-    console.log(process.env.BASE_API_URL);
     const res = await fetch(`${process.env.BASE_API_URL}/auth/login/`, {
       method: "POST",
       headers: {
@@ -37,7 +38,7 @@ export const signin = async (data: SignInParams) => {
       secure: true, // only over HTTPS
       sameSite: "strict", // prevent CSRF
       path: "/", // send on all requests
-      maxAge: 60 * 60 * 24 * 30, // 30d minutes
+      maxAge: 60 * 60 * 24 * 7, // 7d
     });
 
     return user;
@@ -47,18 +48,53 @@ export const signin = async (data: SignInParams) => {
   }
 };
 
-export const getUser = async (id: number) => {
+export const getUser = async () => {
+  console.log("called");
+  const cookiess = await cookies();
+  const refresh = cookiess.get("refresh")?.value;
   try {
-    console.log(process.env.BASE_API_URL);
-    const res = await fetch(
-      `${process.env.BASE_API_URL}/users/user-profiles/${id}`
+    if (!refresh) throw new Error("User is not logged in.");
+    const response = await fetch(
+      `${process.env.BASE_API_URL}/auth/token/refresh/`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      }
     );
+    if (!response.ok) throw new Error("Error fetching refresh token");
+    const ref = await response.json();
+    const access = ref.access;
+    const newRefresh = ref.refresh;
+    if (!ref.access) throw new Error(`${JSON.stringify(ref)}`);
+    cookiess.set({
+      name: "access",
+      value: access,
+      httpOnly: true, // 🔑 makes it HttpOnly
+      secure: true, // only over HTTPS
+      sameSite: "strict", // prevent CSRF
+      path: "/", // send on all requests
+      maxAge: 60 * 15, // 15 minutes
+    });
+    cookiess.set({
+      name: "refresh",
+      value: newRefresh,
+      httpOnly: true, // 🔑 makes it HttpOnly
+      secure: true, // only over HTTPS
+      sameSite: "strict", // prevent CSRF
+      path: "/", // send on all requests
+      maxAge: 60 * 60 * 24 * 7, // 7d
+    });
+    const res = await fetch(`${process.env.BASE_API_URL}/auth/user/`, {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    });
     if (!res.ok) throw new Error("Something went wrong");
     const user = await res.json();
-    console.log(user);
+    if (!user.first_name) throw new Error(`refresh ${refresh}`);
     return user;
   } catch (err: any) {
-    console.error(err.message);
     throw err;
   }
 };

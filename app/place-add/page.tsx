@@ -11,11 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Image from "next/image";
 
 export default function PlaceAddForm() {
   const [formData, setFormData] = useState({
-    make: "BMW",
-    model: "M5",
+    make: "Select Make",
+    model: "Select Model",
     year: "",
     mileage: "",
     engine: "",
@@ -24,14 +25,15 @@ export default function PlaceAddForm() {
   });
 
   const carMakes = [
-    "BMW",
-    "Mercedes-Benz",
-    "Audi",
-    "Toyota",
-    "Honda",
-    "Ford",
-    "Volkswagen",
-    "Nissan",
+    { brand: "Toyota", logo: "/logo/toyota.png" },
+    { brand: "BMW", logo: "/logo/bmw.png" },
+    { brand: "Mercedes-Benz", logo: "/logo/mercedes.webp" },
+    { brand: "Audi", logo: "/logo/audi.png" },
+    { brand: "Hyundai", logo: "/logo/hyundai.webp" },
+    { brand: "Ford", logo: "/logo/ford.webp" },
+    { brand: "Volkswagen", logo: "/logo/vk.svg.png" },
+    { brand: "Nissan", logo: "/logo/nissan.png" },
+    { brand: "BYD", logo: "/logo/byd.webp" },
   ];
 
   const bmwModels = [
@@ -95,8 +97,19 @@ export default function PlaceAddForm() {
               </SelectTrigger>
               <SelectContent>
                 {carMakes.map((make) => (
-                  <SelectItem key={make} value={make}>
-                    {make}
+                  <SelectItem
+                    key={make.brand}
+                    value={make.brand}
+                    className="flex gap-2"
+                  >
+                    <Image
+                      src={make.logo}
+                      alt={`${make.brand} logo`}
+                      width={100}
+                      height={100}
+                      className="w-10 h-auto"
+                    />
+                    <p>{make.brand}</p>
                   </SelectItem>
                 ))}
               </SelectContent>

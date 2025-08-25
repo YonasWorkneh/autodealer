@@ -50,7 +50,10 @@ export default function SignIn() {
   return (
     <Card className="w-[450px]">
       <CardHeader>
-        <div className="flex items-center justify-center gap-2 mb-3 border-b pb-4">
+        <Link
+          href={"/"}
+          className="flex items-center justify-center gap-2 mb-3 border-b pb-4"
+        >
           <div className="w-8 h-8 rounded-full flex items-center justify-center">
             <Image
               src="/wheel.png"
@@ -61,7 +64,7 @@ export default function SignIn() {
             />
           </div>
           <h1>AUTO&mdash;DEALER</h1>
-        </div>
+        </Link>
         <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
         <CardDescription className="text-xs md:text-sm">
           Enter your email below to login to your account
