@@ -19,6 +19,7 @@ import {
   Globe,
   LifeBuoy,
   Calendar,
+  Star,
 } from "lucide-react";
 import Image from "next/image";
 import Header from "@/components/Header";
@@ -337,31 +338,44 @@ export default function CarListingPage() {
                     Chat
                   </Button>
                 </div>
+                {/* rating */}
+                <div className="flex items-center gap-3 mt-2">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      className={`${
+                        index < 4
+                          ? "text-yellow-500 fill-amber-400"
+                          : "text-black"
+                      } `}
+                    />
+                  ))}
+                  <p className="text-gray-500 text-sm">4/5</p>
+                </div>
               </CardContent>
             </Card>
 
             {/* Contact Buttons */}
 
             {/* Inspection Badge */}
-            <Card className="bg-gray-900 text-white">
+            <Card className="bg-zinc-900 text-white">
               <CardContent className="p-4">
                 <div className="text-center">
                   <h3 className="font-semibold mb-1">CARS INSPECTED</h3>
                   <p className="text-sm mb-3">by AUTO&mdash;Dealer</p>
                   <Button
                     size="sm"
-                    className="bg-white text-black hover:bg-gray-100"
+                    className="bg-white text-black hover:bg-gray-100 cursor-pointer"
                   >
                     View Listings
                   </Button>
                 </div>
-                <div className="mt-4">
+                <div className="mt-2 flex justify-center">
                   <Image
-                    src="/red-sports-car.png"
+                    src="/id6-orange.png"
                     alt="Inspected car"
                     width={120}
                     height={120}
-                    className="w-full h-20 object-cover rounded"
+                    className="w-1/2 h-auto object-cover rounded"
                   />
                 </div>
               </CardContent>

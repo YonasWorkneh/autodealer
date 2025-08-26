@@ -325,9 +325,9 @@ export default function CarMarketplace() {
                                 est. {car.monthlyEst}
                               </p>
                             </div>
-                            <Button className="bg-black text-white hover:bg-gray-800 mt-4 cursor-pointer">
+                            {/* <Button className="bg-black text-white hover:bg-gray-800 mt-4 cursor-pointer">
                               Request Info
-                            </Button>
+                            </Button> */}
                           </div>
                         </div>
                       </CardContent>
