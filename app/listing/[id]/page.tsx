@@ -20,7 +20,9 @@ import {
   LifeBuoy,
   Calendar,
   Star,
+  Send,
 } from "lucide-react";
+
 import Image from "next/image";
 import Header from "@/components/Header";
 
@@ -58,6 +60,9 @@ export default function CarListingPage() {
   ];
 
   const visibleFeatures = showAllFeatures ? features : features.slice(0, 8);
+  const message =
+    "HONDA CIVIC . good car with amazing condition.just come and take it and drive enjoy your life. Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam ullam assumenda nesciunt iste aut animi minima adipisci, error ipsa dolor officia officiis hic omnis quae? Ipsum numquam ipsam doloremque porro, sapiente dolor impedit voluptas placeat quisquam dolorum nemo sunt qui necessitatibus, minima molestias perferendis distinctio iste quibusdam officiis alias eaque. Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam ullam assumenda nesciunt iste aut animi minima adipisci, error ipsa dolor officia officiis hic omnis quae? Ipsum numquam ipsam doloremque porro, sapiente dolor impedit voluptas placeat quisquam dolorum nemo sunt qui necessitatibus, minima molestias perferendis distinctio iste quibusdam officiis alias eaque.";
+  const [readIndex, setReadIndex] = useState<number>(140);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -237,15 +242,24 @@ export default function CarListingPage() {
                   HONDA CIVIC (WITH GOLDEN PACKAGE (FAMILY CAR)
                 </h2>
                 <p className="text-gray-700 mb-4">
-                  HONDA CIVIC .GOOD CAR WITH AMAZING CONDITION.JUST COME AND
-                  TAKE IT AND DRIVE ENJOY YOUR LIFE
+                  {message.slice(0, readIndex)}{" "}
+                  {message.length > 140 && (
+                    <span className="text-gray-700 mb-4 cursor-pointer">
+                      ...
+                    </span>
+                  )}
                 </p>
-                <p className="text-gray-700 mb-4">...</p>
+
                 <Button
                   variant="link"
-                  className="text-black p-0 h-auto font-normal"
+                  className="text-black p-0 h-auto font-normal cursor-pointer"
+                  onClick={() =>
+                    setReadIndex(
+                      readIndex === message.length ? 140 : message.length
+                    )
+                  }
                 >
-                  Read More
+                  {readIndex === message.length ? "Show less" : "Read more"}
                 </Button>
                 <div className="mt-4 text-sm text-gray-500">
                   Posted on: 19th July 2025
@@ -263,21 +277,6 @@ export default function CarListingPage() {
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium">Drivers Assistance & Safety</h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">8</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowAllFeatures(!showAllFeatures)}
-                        className="p-1 h-auto"
-                      >
-                        {showAllFeatures ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -319,23 +318,23 @@ export default function CarListingPage() {
                   View All Cars
                 </Button>
                 <div className="flex gap-3 mt-4 border-t py-4">
-                  <Button className="bg-black hover:bg-gray-800 text-white flex items-center gap-2">
+                  <Button className="bg-black hover:bg-gray-800 text-white flex items-center gap-2 cursor-pointer">
                     <Phone className="w-4 h-4" />
                     Call
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 bg-green-50"
+                    className="flex items-center gap-2 bg-green-50 cursor-pointer"
                   >
                     <MessageCircle className="w-4 h-4 text-green-600" />
                     WhatsApp
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 bg-blue-50"
+                    className="flex items-center gap-2 bg-blue-50 cursor-pointer"
                   >
-                    <MessageCircle className="w-4 h-4 text-blue-600" />
-                    Chat
+                    <Send className="w-4 h-4 text-blue-600" />
+                    Telegram
                   </Button>
                 </div>
                 {/* rating */}

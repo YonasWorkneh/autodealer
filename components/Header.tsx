@@ -41,7 +41,7 @@ export default function Header({ color }: HeaderProps) {
         <div className="relative">
           <Input
             placeholder="Search..."
-            className={`w-64  ${
+            className={`w-[450px] py-6  ${
               color === "black"
                 ? "text-black placeholder:text-black/70"
                 : "text-white placeholder:text-white/70 bg-white/10 border-white/20"
