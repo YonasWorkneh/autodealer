@@ -32,14 +32,14 @@ export default function Slider({ items, speed = 30 }: SliderProps) {
           {items.map((item, idx) => (
             <div
               key={idx}
-              className="flex-shrink-0 w-80 flex flex-col items-center"
+              className="flex-shrink-0 w-60 md:w-80 flex flex-col items-center"
             >
-              <div className="w-28 h-20 relative">
+              <div className="w-20 h-12 md:w-28 md:h-20 relative">
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
-                  className="rounded-lg"
+                  className="rounded-lg h-full w-full"
                 />
               </div>
             </div>
@@ -54,9 +54,9 @@ export default function Slider({ items, speed = 30 }: SliderProps) {
           {items.map((item, idx) => (
             <div
               key={idx}
-              className="flex-shrink-0 w-80 flex flex-col items-center"
+              className="flex-shrink-0 w-60 md:w-80 flex flex-col items-center"
             >
-              <div className="w-28 h-20 relative">
+              <div className="w-20 h-12 md:w-28 md:h-20 relative">
                 <Image
                   src={item.image}
                   alt={item.title}

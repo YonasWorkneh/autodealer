@@ -1,7 +1,6 @@
 import React from "react";
 import CarCard from "./CarCard";
 import { Card } from "./ui/card";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 export default function Popular() {
@@ -23,7 +22,7 @@ export default function Popular() {
       backgroundTitle: "BYD",
       km: 0,
       transmission: "Automatic",
-      price: 4_900_000,
+      price: 4900000,
       image: "/byd-song.png",
       colors: [],
       selectedColor: 0,
@@ -34,7 +33,7 @@ export default function Popular() {
       backgroundTitle: "Suzuki",
       km: 10535,
       transmission: "Automatic",
-      price: 2_040_000,
+      price: 2040000,
       image: "/dzire.webp",
       colors: [],
       selectedColor: 1,
@@ -45,7 +44,7 @@ export default function Popular() {
       backgroundTitle: "Jetour",
       km: 0,
       transmission: "Automatic",
-      price: 16_040_000,
+      price: 16040000,
       image: "/jetour.png",
       colors: [],
       selectedColor: 1,
@@ -56,7 +55,7 @@ export default function Popular() {
       backgroundTitle: "BYD",
       km: 0,
       transmission: "Automatic",
-      price: 4_900_000,
+      price: 4900000,
       image: "/byd-song.png",
       colors: [],
       selectedColor: 0,
@@ -67,7 +66,7 @@ export default function Popular() {
       backgroundTitle: "Toyota",
       km: 5000,
       transmission: "Manual/Automatic",
-      price: 10_400_000,
+      price: 10400000,
       image: "/v8.png",
       colors: [],
       selectedColor: 1,
@@ -78,7 +77,7 @@ export default function Popular() {
       backgroundTitle: "Nissan",
       km: 10000,
       transmission: "Manual/Automatic",
-      price: 18_400_000,
+      price: 18400000,
       image: "/niss.png",
       colors: [],
       selectedColor: 1,
@@ -89,7 +88,7 @@ export default function Popular() {
       backgroundTitle: "Suzuki",
       km: 10535,
       transmission: "Automatic",
-      price: 2_040_000,
+      price: 2040000,
       image: "/dzire.webp",
       colors: [],
       selectedColor: 1,
@@ -100,23 +99,26 @@ export default function Popular() {
       backgroundTitle: "Toyota",
       km: 0,
       transmission: "Manual/Automatic",
-      price: 8_500_000,
+      price: 8500000,
       image: "/invincible.png",
       colors: [],
       selectedColor: 1,
     },
   ];
+
   return (
-    <div className="min-h-screen px-40">
-      <div className="flex justify-center mb-10">
-        <h1 className="text-xl text-center w-fit after:content-[''] after:inline-block after:w-[100px] after:absolute after:right-[-120px] after:top-[15px] after:border after:h-[1px] before:content-[''] before:inline-block before:w-[100px] before:absolute before:left-[-120px] before:top-[15px] before:border before:h-[1px] before:border-black/20 after:border-black/20 relative uppercase">
+    <div className="min-h-screen px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-20">
+      {/* Heading */}
+      <div className="flex justify-center mb-10 relative">
+        <h1 className="text-xl sm:text-2xl text-center uppercase relative">
           Popular Cars
+          <span className="absolute top-1/2 left-[-80px] w-16 border-t border-black/20 -translate-y-1/2 hidden md:inline-block" />
+          <span className="absolute top-1/2 right-[-80px] w-16 border-t border-black/20 -translate-y-1/2 hidden md:inline-block" />
         </h1>
       </div>
-      {/* <p className="text-xl mb-10 mt-2 text-black/60">
-        These are some of the popular cars in our site.
-      </p> */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-20 mb-5">
+
+      {/* Cars Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {cars.map((car) => (
           <Card
             key={car.id}
@@ -135,7 +137,9 @@ export default function Popular() {
             />
           </Card>
         ))}
-        <div className="flex items-center ml-10">
+
+        {/* View More */}
+        <div className="flex justify-center sm:justify-start mt-4 sm:mt-0">
           <Link
             href={"/listing"}
             className="group h-[50px] bg-zinc-800 hover:bg-zinc-900 rounded-md text-white p-1 w-fit cursor-pointer flex gap-2 items-center px-3"

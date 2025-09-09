@@ -1,50 +1,30 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Search,
-  ChevronDown,
-  Menu,
-  ArrowRight,
-  ArrowDown,
-  UserCircle,
-  Heart,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+import { ArrowRight, ArrowDown } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import Header from "@/components/Header";
 import About from "@/components/About";
 import Popular from "@/components/Popular";
 import Slider from "@/components/Slider";
 import GetApp from "@/components/GetApp";
 import Footer from "@/components/Footer";
-import Link from "next/link";
-import Header from "@/components/Header";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectScrollDownButton,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import SearchableDropdown from "@/components/SearchableDropdown";
+import RangeDropdown from "@/components/RangeDropdown";
 import { useState } from "react";
 
 export default function AutoDealerLanding() {
   const [filters, setFilters] = useState({
-    search: "",
     make: "",
     model: "",
-    price: "",
-    type: "",
-    year: "",
-    mileage: "",
+    yearMin: "",
+    yearMax: "",
+    mileageMin: "",
+    mileageMax: "",
+    priceMin: "",
+    priceMax: "",
   });
 
   const handleChange = (key: string, value: string) => {
@@ -53,8 +33,37 @@ export default function AutoDealerLanding() {
 
   const handleSearch = () => {
     console.log("Applied filters:", filters);
-    // Call your API or filtering logic here
   };
+
+  const makeOptions = [
+    { label: "Toyota", value: "toyota" },
+    { label: "Honda", value: "honda" },
+    { label: "BMW", value: "bmw" },
+  ];
+  const modelOptions = [
+    { label: "Corolla", value: "corolla" },
+    { label: "Civic", value: "civic" },
+    { label: "X5", value: "x5" },
+  ];
+  const yearOptions = Array.from({ length: 31 }, (_, i) => 1995 + i)
+    .reverse()
+    .map((y) => ({ label: String(y), value: String(y) }));
+  const mileageStops = [
+    0, 10000, 20000, 30000, 40000, 50000, 75000, 100000, 150000, 200000,
+  ];
+  const mileageOptions = mileageStops.map((m) => ({
+    label: m.toLocaleString(),
+    value: String(m),
+  }));
+  const priceStops = [
+    5000, 10000, 15000, 20000, 30000, 40000, 50000, 75000, 100000, 150000,
+    200000,
+  ];
+  const priceOptions = priceStops.map((p) => ({
+    label: `$${p.toLocaleString()}`,
+    value: String(p),
+  }));
+
   const carLogos = [
     { image: "/logo/byd.webp", title: "BYD" },
     { image: "/logo/hyundai.webp", title: "Hyundai" },
@@ -72,283 +81,164 @@ export default function AutoDealerLanding() {
     { image: "/logo/mercedes.webp", title: "Mercedes" },
     { image: "/logo/lexus.png", title: "Lexus" },
   ];
-  return (
-    <div>
-      <div className="min-h-screen relative overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/hero-background.jpg"
-            alt="Luxury marina background"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
 
-        {/* Header */}
+  return (
+    <div className="relative overflow-hidden">
+      {/* Hero Section */}
+      <div className="relative min-h-screen">
+        <Image
+          src="/hero-background.jpg"
+          alt="Luxury marina background"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/60" />
+
         <Header />
 
-        {/* Main Content */}
-        <div className="relative z-10 flex-1 px-40">
-          <div>
-            <div className="flex flex-col justify-center min-h-[calc(100vh-200px)]">
-              <div className="flex gap-56 mb-36">
-                {/* Left Content */}
-                <div className="col-span-7">
-                  <motion.h1
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="text-6xl font-light text-white leading-tight mb-16"
-                  >
-                    Embark On The Journey
-                    <br />
-                    Of Luxury –<br />
-                    <span className="italic">Your Dream Car Awaits</span>
-                  </motion.h1>
+        <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 pt-20 lg:pt-32">
+            {/* Left Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="flex-1 text-white"
+            >
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light leading-tight mb-8">
+                Embark On The Journey <br />
+                Of Luxury – <br />
+                <span className="italic">Your Dream Car Awaits</span>
+              </h1>
 
-                  {/* Car Specs */}
-                  <div className="flex space-x-16 mt-auto">
-                    <div>
-                      <div className="text-5xl font-light text-white mb-2">
-                        2024
-                      </div>
-                      <div className="text-white/70 text-sm">Year</div>
-                    </div>
-                    <div>
-                      <div className="text-5xl font-light text-white mb-2">
-                        600
-                      </div>
-                      <div className="text-white/70 text-sm">KM / CHARGE</div>
-                    </div>
-                    <div>
-                      <div className="text-5xl font-light text-white mb-2">
-                        85
-                      </div>
-                      <div className="text-white/70 text-sm">KWH</div>
-                    </div>
+              <div className="flex flex-wrap gap-8 mt-6">
+                <div>
+                  <div className="text-3xl sm:text-5xl font-light mb-1">
+                    2024
                   </div>
+                  <div className="text-white/70 text-sm">Year</div>
                 </div>
-
-                {/* Right Content */}
-                <div className="relative">
-                  {/* Car Details Card */}
-                  <Card className="bg-white/10 backdrop-blur-sm border-white/20 mb-6">
-                    <CardContent className="p-2 px-10">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-white text-xl font-semibold mb-2">
-                            BYD &mdash; SONG
-                          </h3>
-                          <p className="text-white/70 text-sm">
-                            Auto transmission • Full insurance
-                          </p>
-                        </div>
-                      </div>
-                      <div className="w-[300px] h-[200px] relative">
-                        <Image
-                          src="/byd.png"
-                          alt="Blue Lotus Emira"
-                          fill
-                          className="object-cover rounded"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Explore Button */}
-                  <Link href={"/listing"}>
-                    <Button className="bg-white/10 cursor-pointer hover:bg-white/20 border border-white/20 text-white backdrop-blur-sm w-full justify-between">
-                      <span>Explore Our Cars</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
+                <div>
+                  <div className="text-3xl sm:text-5xl font-light mb-1">
+                    600
+                  </div>
+                  <div className="text-white/70 text-sm">KM / CHARGE</div>
+                </div>
+                <div>
+                  <div className="text-3xl sm:text-5xl font-light mb-1">85</div>
+                  <div className="text-white/70 text-sm">KWH</div>
                 </div>
               </div>
-              {/* search */}
-              <Card className="bg-white/10 border-white/20 backdrop-blur-md text-white p-6 rounded-xl">
-                <CardContent className="space-y-4">
-                  <p className="text-2xl font-semibold mb-6">
-                    Find your perfect car
-                  </p>
-                  {/* Filter grid */}
-                  <div className="flex justify-between md:grid-cols-3 gap-4">
-                    {/* Make */}
-                    <Select onValueChange={(v) => handleChange("make", v)}>
-                      <SelectTrigger className="bg-white/10 border-white/20 !text-white w-full p-4 py-8">
-                        <SelectValue placeholder="Select Make" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/20 border-white/20">
-                        <SelectItem
-                          value="toyota"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          Toyota
-                        </SelectItem>
-                        <SelectItem
-                          value="honda"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          Honda
-                        </SelectItem>
-                        <SelectItem
-                          value="bmw"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          BMW
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {/* Model */}
-                    <Select onValueChange={(v) => handleChange("model", v)}>
-                      <SelectTrigger className="bg-white/10 border-white/20 !text-white w-full p-4 py-8 ">
-                        <SelectValue placeholder="Select Model" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/20 border-white/20">
-                        <SelectItem
-                          value="corolla"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          Corolla
-                        </SelectItem>
-                        <SelectItem
-                          value="civic"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          Civic
-                        </SelectItem>
-                        <SelectItem
-                          value="x5"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          X5
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {/* Vehicle type */}
-                    <Select onValueChange={(v) => handleChange("type", v)}>
-                      <SelectTrigger className="bg-white/10 border-white/20 !text-white w-full p-4 py-8">
-                        <SelectValue placeholder="Vehicle Type" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/20 border-white/20">
-                        <SelectItem
-                          value="sedan"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          Sedan
-                        </SelectItem>
-                        <SelectItem
-                          value="suv"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          SUV
-                        </SelectItem>
-                        <SelectItem
-                          value="truck"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          Truck
-                        </SelectItem>
-                        <SelectItem
-                          value="van"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          Van
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {/* Year */}
-                    <Select onValueChange={(v) => handleChange("year", v)}>
-                      <SelectTrigger className="bg-white/10 border-white/20 !text-white w-full p-4 py-8">
-                        <SelectValue placeholder="Year" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/20 border-white/20">
-                        <SelectItem
-                          value="2025"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          2025
-                        </SelectItem>
-                        <SelectItem
-                          value="2024"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          2024
-                        </SelectItem>
-                        <SelectItem
-                          value="2023"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          2023
-                        </SelectItem>
-                        <SelectItem
-                          value="2020-2022"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          2020 - 2022
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {/* Mileage */}
-                    <Select onValueChange={(v) => handleChange("mileage", v)}>
-                      <SelectTrigger className="bg-white/10 border-white/20 !text-white w-full p-4 py-8">
-                        <SelectValue placeholder="Mileage" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/20 border-white/20">
-                        <SelectItem
-                          value="0-20000"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          0 - 20,000 km
-                        </SelectItem>
-                        <SelectItem
-                          value="20000-50000"
-                          className="text-white  data-[highlighted]:bg-white/20 data-[highlighted]:text-white data-[state=checked]:bg-white/30 data-[state=checked]:font-semibold"
-                        >
-                          20,000 - 50,000 km
-                        </SelectItem>
-                        <SelectItem
-                          value="50000-100000"
-                          className="text-white  data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[state=checked]:bg-white/20 data-[state=checked]:font-semibold"
-                        >
-                          50,000 - 100,000 km
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>{" "}
-                    <div className="flex justify-end">
-                      <Button
-                        onClick={handleSearch}
-                        className="bg-zinc-900 border border-white/30 hover:bg-zinc-900 text-white rounded-md w-(calc(100%+60px)) h-full cursor-pointer"
-                      >
-                        Apply Filters
-                      </Button>
-                    </div>
-                  </div>
+            </motion.div>
 
-                  {/* Submit button */}
+            {/* Right Content */}
+            <div className="flex-1 flex flex-col gap-6">
+              <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
+                <CardContent className="p-4 sm:p-6">
+                  <h3 className="text-white text-xl font-semibold mb-2">
+                    BYD — SONG
+                  </h3>
+                  <p className="text-white/70 text-sm mb-4">
+                    Auto transmission • Full insurance
+                  </p>
+                  <div className="w-full h-[200px] sm:h-[320px] relative">
+                    <Image
+                      src="/byd.png"
+                      alt="BYD Song"
+                      fill
+                      className="object-cover rounded"
+                    />
+                  </div>
                 </CardContent>
               </Card>
+              <Link href="/listing">
+                <Button className="bg-white/10 hover:bg-white/20 border border-white/20 text-white w-full justify-between backdrop-blur-sm py-6">
+                  <span>Explore Our Cars</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
             </div>
           </div>
 
-          {/* Scroll Down Indicator */}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex items-center flex-col">
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ repeat: Infinity, duration: 1.2, ease: "easeIn" }}
-            >
-              <ArrowDown size={18} className="text-white/70" />
-            </motion.div>
-            <div className="text-white/70 text-sm mt-4">Scroll Down</div>
-          </div>
+          {/* Search / Filter Card */}
+          <Card className="bg-white/10 border-white/20 backdrop-blur-md text-white p-6 sm:p-10 rounded-xl mt-5">
+            <CardContent className="space-y-4">
+              <p className="text-2xl sm:text-2xl font-semibold mb-4">
+                Find your perfect car
+              </p>
+              <div className="flex flex-col lg:flex-row flex-wrap lg:flex-nowrap gap-4">
+                <SearchableDropdown
+                  items={makeOptions}
+                  placeholder="Select Make"
+                  value={filters.make}
+                  onChange={(v) => handleChange("make", v)}
+                />
+                <SearchableDropdown
+                  items={modelOptions}
+                  placeholder="Select Model"
+                  value={filters.model}
+                  onChange={(v) => handleChange("model", v)}
+                />
+                <RangeDropdown
+                  items={yearOptions}
+                  minPlaceholder="Min year"
+                  maxPlaceholder="Max year"
+                  placeholder="Model Year"
+                  minValue={filters.yearMin}
+                  maxValue={filters.yearMax}
+                  onMinChange={(v) => handleChange("yearMin", v)}
+                  onMaxChange={(v) => handleChange("yearMax", v)}
+                />
+                <RangeDropdown
+                  items={mileageOptions}
+                  minPlaceholder="Min mileage"
+                  maxPlaceholder="Max mileage"
+                  placeholder="Mileage"
+                  minValue={filters.mileageMin}
+                  maxValue={filters.mileageMax}
+                  onMinChange={(v) => handleChange("mileageMin", v)}
+                  onMaxChange={(v) => handleChange("mileageMax", v)}
+                />
+                <RangeDropdown
+                  items={priceOptions}
+                  minPlaceholder="Min price"
+                  maxPlaceholder="Max price"
+                  placeholder="Price"
+                  minValue={filters.priceMin}
+                  maxValue={filters.priceMax}
+                  onMinChange={(v) => handleChange("priceMin", v)}
+                  onMaxChange={(v) => handleChange("priceMax", v)}
+                />
+                <div>
+                  <Button
+                    onClick={handleSearch}
+                    className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-md !px-6 h-full"
+                  >
+                    <ArrowRight className="w-4 h-4 mr-2" /> Search
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Scroll Down Indicator */}
+        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+          >
+            <ArrowDown size={20} className="text-white/70" />
+          </motion.div>
+          <span className="text-white/70 text-sm mt-2">Scroll Down</span>
         </div>
       </div>
+
       <About />
       <Popular />
       <GetApp />
-      <div className="px-40 pb-40">
+      <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-16">
         <Slider items={carLogos} />
       </div>
       <Footer />
