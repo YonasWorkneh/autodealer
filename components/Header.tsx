@@ -74,22 +74,22 @@ export default function Header({ color }: HeaderProps) {
           Favourites
         </Link>
         <Link
-          href={user.first_name ? "profile" : "/signin"}
+          href={user.email ? "profile" : "/signin"}
           className={` ${
             color === "black"
               ? "text-black hover:text-black/60"
               : "text-white hover:text-white/80"
           }  p-2 px-4 rounded-md cursor-pointer`}
         >
-          {user.first_name ? (
+          {user.email ? (
             <span
               className={`${
                 color === "black"
                   ? "bg-zinc-800 hover:bg-zinc-900 text-white"
                   : " bg-white/10 hover:bg-white/20"
-              } size-10 flex justify-center items-center rounded-full`}
+              } size-10 flex justify-center items-center rounded-full uppercase`}
             >
-              {user.first_name[0] + user.last_name[0]}
+              {user.email[0]}
             </span>
           ) : (
             "Signin"
@@ -103,7 +103,7 @@ export default function Header({ color }: HeaderProps) {
               : " bg-white/10 hover:bg-white/20"
           } p-2 px-4 rounded-md cursor-pointer`}
           onClick={(e) => {
-            if (!user.first_name) {
+            if (!user.email) {
               console.log("prevented");
               e.preventDefault();
               toast.error("Log in or create an account to sell your car.");

@@ -19,6 +19,7 @@ export const signin = async (data: SignInParams) => {
     });
     if (!res.ok) throw new Error("Something went wrong");
     const user = await res.json();
+    console.log(user);
     if (!user.access)
       throw new Error("Error trying to log you in. Please try again.");
     const cookiess = await cookies();
@@ -34,6 +35,15 @@ export const signin = async (data: SignInParams) => {
     cookiess.set({
       name: "refresh",
       value: user.refresh,
+      httpOnly: true, // 🔑 makes it HttpOnly
+      secure: true, // only over HTTPS
+      sameSite: "strict", // prevent CSRF
+      path: "/", // send on all requests
+      maxAge: 60 * 60 * 24 * 7, // 7d
+    });
+    cookiess.set({
+      name: "pk",
+      value: user.pk,
       httpOnly: true, // 🔑 makes it HttpOnly
       secure: true, // only over HTTPS
       sameSite: "strict", // prevent CSRF
@@ -92,7 +102,7 @@ export const getUser = async () => {
     });
     if (!res.ok) throw new Error("Something went wrong");
     const user = await res.json();
-    if (!user.first_name) throw new Error(`refresh ${refresh}`);
+    if (!user.email) throw new Error(`refresh ${refresh}`);
     return user;
   } catch (err: any) {
     throw err;

@@ -107,97 +107,88 @@ export default function CarMarketplace() {
 
                     {/* Make & Model */}
                     <div className="mb-6">
-                      <h3 className="font-semibold text-black mb-3">
-                        MAKE, MODEL & TRIM
+                      <h3 className="text-sm font-semibold text-black mb-3">
+                        Make & Model
                       </h3>
-                      <Select>
-                        <SelectTrigger className="border-gray-300">
-                          <SelectValue placeholder="All makes & models" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">
-                            All makes & models
-                          </SelectItem>
-                          <SelectItem value="jeep">Jeep</SelectItem>
-                          <SelectItem value="kia">Kia</SelectItem>
-                          <SelectItem value="chevrolet">Chevrolet</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="grid grid-cols-2 gap-4">
+                        {" "}
+                        <Select>
+                          <SelectTrigger className="border-gray-300 w-full !h-[50px] !rounded-sm">
+                            <SelectValue placeholder="Make" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="jeep">Jeep</SelectItem>
+                            <SelectItem value="kia">Kia</SelectItem>
+                            <SelectItem value="chevrolet">Chevrolet</SelectItem>
+                          </SelectContent>
+                        </Select>{" "}
+                        <Select>
+                          <SelectTrigger className="border-gray-300 w-full !h-[50px] !rounded-sm">
+                            <SelectValue placeholder="Model" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="jeep">1 series</SelectItem>
+                            <SelectItem value="kia">2 series</SelectItem>
+                            <SelectItem value="chevrolet">3 series</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
 
                     {/* Year Range */}
                     <div className="mb-6">
-                      <h3 className="font-semibold text-black mb-3">
-                        YEAR RANGE
+                      <h3 className="text-sm font-semibold text-black mb-3">
+                        Year
                       </h3>
                       <div className="flex items-center space-x-2 mb-3">
                         <Input
                           placeholder="1940"
-                          className="text-sm border-gray-300"
+                          className="text-sm border-gray-300 h-[50px] rounded-sm"
                         />
                         <span className="text-gray-500">to</span>
                         <Input
                           placeholder="2026"
-                          className="text-sm border-gray-300"
+                          className="text-sm border-gray-300 h-[50px] rounded-sm"
                         />
                       </div>
-                      <Slider
-                        defaultValue={[1940, 2026]}
-                        max={2026}
-                        min={1940}
-                        step={1}
-                        className="w-full"
-                      />
                     </div>
 
                     {/* Price Range */}
                     <div className="mb-6">
-                      <h3 className="font-semibold text-black mb-3">
-                        PRICE RANGE
+                      <h3 className="text-sm font-semibold text-black mb-3">
+                        Price
                       </h3>
                       <div className="flex items-center space-x-2 mb-3">
                         <Input
                           placeholder="$0"
-                          className="text-sm border-gray-300"
+                          className="text-sm border-gray-300 h-[50px] rounded-sm"
                         />
                         <span className="text-gray-500">to</span>
                         <Input
                           placeholder="$100,000+"
-                          className="text-sm border-gray-300"
+                          className="text-sm border-gray-300 h-[50px] rounded-sm"
                         />
                       </div>
-                      <Slider
-                        defaultValue={[0, 100000]}
-                        max={100000}
-                        min={0}
-                        step={1000}
-                        className="w-full"
-                      />
                     </div>
 
                     {/* Max Mileage */}
                     <div className="mb-6">
-                      <h3 className="font-semibold text-black mb-3">
-                        MAX MILEAGE
+                      <h3 className="text-sm font-semibold text-black mb-3">
+                        Max Mileage
                       </h3>
                       <div className="flex items-center space-x-2 mb-3">
                         <Input
                           placeholder="0 mi."
-                          className="text-sm border-gray-300"
+                          className="text-sm border-gray-300 h-[50px] rounded-sm"
                         />
                         <span className="text-gray-500">to</span>
                         <Input
                           placeholder="300,000+ mi."
-                          className="text-sm border-gray-300"
+                          className="text-sm border-gray-300 h-[50px] rounded-sm"
                         />
                       </div>
-                      <Slider
-                        defaultValue={[0, 300000]}
-                        max={300000}
-                        min={0}
-                        step={1000}
-                        className="w-full"
-                      />
                     </div>
                   </CardContent>
                 </Card>

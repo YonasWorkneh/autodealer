@@ -55,8 +55,10 @@ export default function UserProfile() {
                   src="/professional-woman-with-braids.png"
                   alt="Sienna Hewitt"
                 />
-                <AvatarFallback className="text-xl font-semibold bg-gray-100">
-                  {user.first_name[0] + user.last_name[0]}
+                <AvatarFallback className="text-xl font-semibold bg-gray-100 uppercase">
+                  {user.first_name
+                    ? user.first_name?.[0] + user.last_name?.[0]
+                    : user.email[0]}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -66,7 +68,9 @@ export default function UserProfile() {
           <div className="mt-6">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-2xl font-bold text-black">
-                {user.first_name + " " + user.last_name}
+                {user.first_name &&
+                  user.first_name + " " + user.last_name &&
+                  user.last_name}
               </h1>
             </div>
             <p className="text-gray-600 mb-6">{email}</p>

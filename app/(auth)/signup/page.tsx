@@ -23,7 +23,6 @@ import { signup } from "@/lib/auth/signup";
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const { handleSubmit, register, formState } = useForm();
   const { errors } = formState;
   const [err, setErr] = useState("");
@@ -67,7 +66,7 @@ export default function SignIn() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-          <div className="grid grid-cols-2 gap-2">
+          {/* <div className="grid grid-cols-2 gap-2">
             <div className="grid gap-2">
               <Label htmlFor="fname">First Name</Label>
               <Input
@@ -102,7 +101,7 @@ export default function SignIn() {
                 </p>
               )}
             </div>
-          </div>
+          </div> */}
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
