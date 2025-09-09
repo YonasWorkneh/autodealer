@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Plus } from "lucide-react";
+import { useCar, useCars, useMakes } from "@/hooks/cars";
 
 export default function PlaceAddForm() {
   const [step, setStep] = useState(1);
@@ -97,6 +98,10 @@ export default function PlaceAddForm() {
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
   };
+  const { data } = useMakes();
+  useEffect(() => {
+    console.log("data", data);
+  });
 
   return (
     <div className="grid h-screen place-items-center">

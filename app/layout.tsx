@@ -4,7 +4,6 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Session from "./Session";
-import { getUser } from "@/lib/auth/signin";
 
 export const metadata: Metadata = {
   title: "E-Car",
@@ -15,6 +14,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en">
       <head>

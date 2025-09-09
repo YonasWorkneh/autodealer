@@ -87,8 +87,10 @@ export default function PricingPage() {
             <CardContent>
               <div className="mb-6">
                 <div className="flex items-baseline gap-2">
-                  <div className="text-4xl font-bold text-gray-900">$89</div>
-                  <div className="text-gray-400 line-through">$100</div>
+                  <div className="text-4xl font-bold text-gray-900">
+                    Birr 89
+                  </div>
+                  <div className="text-gray-400 line-through">Birr 100</div>
                 </div>
                 <div className="text-gray-600">
                   per agent, per year, billed annually
@@ -137,7 +139,7 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <div className="text-4xl font-bold text-gray-900">$139</div>
+                <div className="text-4xl font-bold text-gray-900">Birr 139</div>
                 <div className="text-gray-600">
                   per agent, per year, billed annually
                 </div>
@@ -152,13 +154,11 @@ export default function PricingPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-gray-700">Unlimited Accounts</span>
+                  <span className="text-gray-700">Unlimited car posts</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-gray-700">
-                    Unlimited transfer or direct debit
-                  </span>
+                  <span className="text-gray-700">Analytics & report</span>
                 </li>
               </ul>
 

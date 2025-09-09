@@ -5,7 +5,9 @@ import { useUserStore } from "@/store/user";
 import React, { ReactElement, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Loading from "./loading";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+const queryClient = new QueryClient();
 export default function Session({ children }: { children: ReactElement }) {
   const { setUser } = useUserStore();
   const [isLoadingUser, setIsLoadingUser] = useState(true);
@@ -22,5 +24,9 @@ export default function Session({ children }: { children: ReactElement }) {
     };
     fetchUser();
   }, []);
-  return <div>{isLoadingUser ? <Loading /> : <>{children}</>}</div>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      {isLoadingUser ? <Loading /> : <>{children}</>}
+    </QueryClientProvider>
+  );
 }

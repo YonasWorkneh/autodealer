@@ -38,21 +38,6 @@ export default function Header({ color }: HeaderProps) {
       </Link>
 
       <div className="flex items-center space-x-6">
-        <div className="relative">
-          <Input
-            placeholder="Search..."
-            className={`w-[450px] py-6  ${
-              color === "black"
-                ? "text-black placeholder:text-black/70"
-                : "text-white placeholder:text-white/70 bg-white/10 border-white/20"
-            }  pr-10`}
-          />
-          <Search
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-              color === "black" ? "text-black/70" : "text-white/70"
-            } `}
-          />
-        </div>
         <Link
           href={"/listing"}
           className={` ${
