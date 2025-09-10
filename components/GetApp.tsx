@@ -9,8 +9,8 @@ export default function GetApp() {
       <div className="flex justify-center mb-10 relative">
         <h1 className="text-xl sm:text-2xl text-center uppercase relative">
           Get App
-          <span className="absolute top-1/2 left-[-60px] w-16 border-t border-black/20 -translate-y-1/2 hidden md:inline-block" />
-          <span className="absolute top-1/2 right-[-60px] w-16 border-t border-black/20 -translate-y-1/2 hidden md:inline-block" />
+          <span className="absolute top-1/2 left-[-80px] w-16 border-t border-black/20 -translate-y-1/2 hidden md:inline-block" />
+          <span className="absolute top-1/2 right-[-80px] w-16 border-t border-black/20 -translate-y-1/2 hidden md:inline-block" />
         </h1>
       </div>
 

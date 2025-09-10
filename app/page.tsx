@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, ArrowDown } from "lucide-react";
+import { ArrowRight, ArrowDown, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -13,12 +13,16 @@ import GetApp from "@/components/GetApp";
 import Footer from "@/components/Footer";
 import SearchableDropdown from "@/components/SearchableDropdown";
 import RangeDropdown from "@/components/RangeDropdown";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useMakes, useModels } from "@/hooks/cars";
+import Loading from "./loading";
+import { useRouter } from "next/navigation";
 
 export default function AutoDealerLanding() {
+  const router = useRouter();
   const [filters, setFilters] = useState({
-    make: "",
-    model: "",
+    make: null,
+    model: null,
     yearMin: "",
     yearMax: "",
     mileageMin: "",
@@ -27,12 +31,30 @@ export default function AutoDealerLanding() {
     priceMax: "",
   });
 
-  const handleChange = (key: string, value: string) => {
+  const handleChange = (key: string, value: any) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const buildSearchParams = (filters: any) => {
+    const params = new URLSearchParams();
+
+    if (filters.make) params.set("make", filters.make);
+    if (filters.model) params.set("model", filters.model);
+    if (filters.yearMin) params.set("yearMin", filters.yearMin);
+    if (filters.yearMax) params.set("yearMax", filters.yearMax);
+    if (filters.mileageMin) params.set("mileageMin", filters.mileageMin);
+    if (filters.mileageMax) params.set("mileageMax", filters.mileageMax);
+    if (filters.priceMin) params.set("priceMin", filters.priceMin);
+    if (filters.priceMax) params.set("priceMax", filters.priceMax);
+
+    return params.toString();
   };
 
   const handleSearch = () => {
     console.log("Applied filters:", filters);
+    const searchParams = buildSearchParams(filters);
+    const url = searchParams ? `/listing?${searchParams}` : "/listing";
+    router.push(url);
   };
 
   const makeOptions = [
@@ -81,6 +103,21 @@ export default function AutoDealerLanding() {
     { image: "/logo/mercedes.webp", title: "Mercedes" },
     { image: "/logo/lexus.png", title: "Lexus" },
   ];
+  const { data: makes, isLoading } = useMakes();
+  const {
+    data: models,
+    isPending,
+    refetch,
+  } = useModels(filters.make ? filters.make : undefined);
+
+  useEffect(() => {
+    console.log(filters.make);
+    if (filters.make) {
+      refetch();
+    }
+  }, [filters.make, refetch]);
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="relative overflow-hidden">
@@ -169,16 +206,24 @@ export default function AutoDealerLanding() {
               </p>
               <div className="flex flex-col lg:flex-row flex-wrap lg:flex-nowrap gap-4">
                 <SearchableDropdown
-                  items={makeOptions}
-                  placeholder="Select Make"
+                  items={makes?.map((make) => {
+                    return { value: make.id, label: make.name };
+                  })}
+                  placeholder="Make"
                   value={filters.make}
                   onChange={(v) => handleChange("make", v)}
                 />
                 <SearchableDropdown
-                  items={modelOptions}
-                  placeholder="Select Model"
+                  items={
+                    models?.map((model) => ({
+                      value: model.id,
+                      label: model.name,
+                    })) ?? []
+                  }
+                  placeholder="Model"
                   value={filters.model}
                   onChange={(v) => handleChange("model", v)}
+                  className={isPending ? "opacity-50 pointer-events-none" : ""}
                 />
                 <RangeDropdown
                   items={yearOptions}
@@ -213,9 +258,9 @@ export default function AutoDealerLanding() {
                 <div>
                   <Button
                     onClick={handleSearch}
-                    className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-md !px-6 h-full"
+                    className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-md !px-6 h-full text-base cursor-pointer"
                   >
-                    <ArrowRight className="w-4 h-4 mr-2" /> Search
+                    <Search className="w-4 h-4 mr-2" /> Search
                   </Button>
                 </div>
               </div>

@@ -64,7 +64,7 @@ export default function RangeDropdown({
             className="bg-white/10 hover:bg-white/20 border-white/20 !text-white col-span-2 w-full p-4 py-8 justify-between"
           >
             <span
-              className={!minValue && !maxValue ? "text-white/60" : undefined}
+              className={!minValue && !maxValue ? "text-white" : undefined}
             >
               {placeholder}
             </span>

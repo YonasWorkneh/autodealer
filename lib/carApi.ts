@@ -30,7 +30,6 @@ const credentials = async () => {
 
 export async function fetchCars(): Promise<Car[]> {
   const credential = await credentials();
-  console.log("credential", credential);
   return fetcher<Car[]>("/inventory/cars/", {
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -44,7 +43,6 @@ export async function fetchCarById(id: string): Promise<Car> {
 
 export async function fetchMakes(): Promise<Make[]> {
   const credential = await credentials();
-  console.log("credential", credential);
   return fetcher<Make[]>("/inventory/makes/", {
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -54,11 +52,14 @@ export async function fetchMakes(): Promise<Make[]> {
 
 export async function fetchModels(makeId?: number): Promise<Model[]> {
   const credential = await credentials();
-  console.log("credential", credential);
   const url = makeId
     ? `/inventory/models/?make=${makeId}`
     : "/inventory/models/";
-  return fetcher<Model[]>(url);
+  return fetcher<Model[]>(url, {
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
 }
 
 export async function postCar(car: Car): Promise<Car> {

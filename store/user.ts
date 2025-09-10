@@ -8,6 +8,7 @@ type UserStore = {
   is_active?: boolean;
   is_staff?: boolean;
   is_superuser?: boolean;
+  contact?: string;
 };
 
 type UserState = {

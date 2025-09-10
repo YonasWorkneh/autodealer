@@ -18,23 +18,23 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 
-type Item = { label: string; value: string };
+type Item = { label: string; value: number | null };
 
 export default function SearchableDropdown({
-  items,
+  items = [],
   placeholder,
   value,
   onChange,
   className,
 }: {
-  items: Item[];
+  items?: Item[];
   placeholder: string;
-  value?: string;
-  onChange: (v: string) => void;
+  value?: number|null;
+  onChange: (v: number) => void;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const selected = items.find((it) => it.value === value)?.label ?? "";
+  const selected = items?.find((it) => it.value === value)?.label ?? "";
 
   return (
     <div className="w-full cursor-pointer">
@@ -49,17 +49,14 @@ export default function SearchableDropdown({
               className
             )}
           >
-            <span className={cn(!selected && "text-white/60")}>
+            <span className={cn(!selected && "text-white")}>
               {selected || placeholder}
             </span>
             <ChevronsUpDown className="opacity-70" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          className="bg-white/10 border-white/20 p-0 w-full"
-          align={"start"}
-        >
-          <Command className="w-full">
+        <PopoverContent className="w-full" align={"start"}>
+          <Command className="w-[400px]">
             <CommandInput
               placeholder={`Search ${placeholder}`}
               className="w-full"
@@ -67,12 +64,12 @@ export default function SearchableDropdown({
             <CommandList className="w-full">
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup className="w-full">
-                {items.map((it) => (
+                {items?.map((it) => (
                   <CommandItem
                     key={it.value}
                     value={it.label}
                     onSelect={() => {
-                      onChange(it.value);
+                      it.value && onChange(it.value);
                       setOpen(false);
                     }}
                     className="text-black data-[selected=true]:text-black/70"
