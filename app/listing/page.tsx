@@ -382,7 +382,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Heart, MapPin, Filter } from "lucide-react";
+import { Search, Heart, MapPin, Filter, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -442,13 +442,52 @@ export default function CarMarketplace() {
       percentLess: null,
       image: "/2025-white-chevy-colorado.png",
     },
+    {
+      id: 4,
+      year: 2025,
+      make: "Chevrolet",
+      model: "Colorado WT/LT",
+      mileage: "New",
+      location: "Austin, TX",
+      price: "$38,659",
+      monthlyEst: "$669/mo",
+      daysOnMarket: 189,
+      percentLess: null,
+      image: "/2025-white-chevy-colorado.png",
+    },
+    {
+      id: 5,
+      year: 2025,
+      make: "Chevrolet",
+      model: "Colorado WT/LT",
+      mileage: "New",
+      location: "Austin, TX",
+      price: "$38,659",
+      monthlyEst: "$669/mo",
+      daysOnMarket: 189,
+      percentLess: null,
+      image: "/2025-white-chevy-colorado.png",
+    },
+    {
+      id: 6,
+      year: 2025,
+      make: "Chevrolet",
+      model: "Colorado WT/LT",
+      mileage: "New",
+      location: "Austin, TX",
+      price: "$38,659",
+      monthlyEst: "$669/mo",
+      daysOnMarket: 189,
+      percentLess: null,
+      image: "/2025-white-chevy-colorado.png",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <Header color="black" />
 
-      <div className="pt-16 px-4 sm:px-6 lg:px-16">
+      <div className="pt-16 px-4 sm:px-6 lg:px-40">
         {/* Mobile Filter Button */}
         <div className="sm:hidden mb-4 flex justify-end">
           <Button
@@ -470,17 +509,17 @@ export default function CarMarketplace() {
           <div className="lg:col-span-3 space-y-6">
             {/* Search and Sort */}
             <div className="sticky top-0 bg-white z-40 pb-4">
-              <Card className="border-gray-200 rounded-3xl shadow-none py-0">
+              <Card className="border-gray-200 rounded-3xl shadow-none py-4">
                 <CardContent className="flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div className="relative w-full sm:flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <Input
                       placeholder="Search by make, model, or body style"
-                      className="pl-10 h-12 text-lg border-none shadow-none focus:ring-0 w-full"
+                      className="pl-10 h-12 text-lg border-none shadow-none focus:ring-0 focus:outline-none w-full focus-visible:ring-0"
                     />
                   </div>
 
-                  <div className="flex flex-col sm:flex-row border-t sm:border-t-0 sm:border-l border-gray-200 py-4 sm:py-0 justify-center items-center gap-2 sm:gap-4">
+                  <div className="flex flex-col sm:flex-row border-t pl-2 sm:border-t-0 sm:border-l border-gray-200 py-4 sm:py-0 justify-center items-center gap-2 sm:gap-4">
                     <p className="font-bold text-xs text-center uppercase">
                       Sort By
                     </p>
@@ -566,6 +605,18 @@ export default function CarMarketplace() {
                       </div>
                     </CardContent>
                   </Card>
+                  <Button
+                    className="absolute top-[calc(50%-15px)] -right-3 z-50 cursor-pointer w-fit h-fit flex flex-col gap-1 bg-transparent shadow-none hover:bg-transparent border border-gray-200 rounded-xl p-2"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDetailOpened(true);
+                    }}
+                  >
+                    <span className="inline-block size-[6px] bg-gray-500 rounded-full p-0" />
+                    <span className="inline-block size-[6px] bg-gray-500 rounded-full" />
+                    <span className="inline-block size-[6px] bg-gray-500 rounded-full" />
+                  </Button>
                 </Link>
               ))}
             </div>
@@ -621,7 +672,7 @@ export default function CarMarketplace() {
 // Sidebar Filters Component
 function FilterSidebar({ close }: { close?: () => void }) {
   return (
-    <Card className="border-none shadow-none mb-6">
+    <Card className="border-none shadow-none mb-6 sm:border sm:shadow-sm !sm:border-gray-500 sticky top-0 bg-white z-40">
       <CardContent className="p-4 sm:p-6 space-y-6">
         <Button
           variant="outline"
