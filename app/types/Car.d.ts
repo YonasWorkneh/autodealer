@@ -23,3 +23,9 @@ export interface Car {
   created_at: string;
   updated_at: string;
 }
+
+export interface Feature {
+  id: string;
+  label: string;
+  checked: boolean;
+}

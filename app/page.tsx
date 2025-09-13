@@ -135,7 +135,7 @@ export default function AutoDealerLanding() {
         <Header />
 
         <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 lg:pt-10">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 pt-10">
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}

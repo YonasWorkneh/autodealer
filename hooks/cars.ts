@@ -32,7 +32,7 @@ export function useMakes() {
 }
 
 export function useModels(makeId?: number) {
-  console.log("makeId", makeId);
+  // console.log("makeId", makeId);
   return useQuery({
     queryKey: ["models", makeId],
     queryFn: () => fetchModels(makeId),

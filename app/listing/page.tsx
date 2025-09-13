@@ -672,7 +672,7 @@ export default function CarMarketplace() {
 // Sidebar Filters Component
 function FilterSidebar({ close }: { close?: () => void }) {
   return (
-    <Card className="border-none shadow-none mb-6 sm:border sm:shadow-sm !sm:border-gray-500 sticky top-0 bg-white z-40">
+    <Card className="mb-6 sticky top-0 bg-white z-40">
       <CardContent className="p-4 sm:p-6 space-y-6">
         <Button
           variant="outline"
