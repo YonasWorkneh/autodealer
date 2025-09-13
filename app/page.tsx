@@ -120,7 +120,7 @@ export default function AutoDealerLanding() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative">
       {/* Hero Section */}
       <div className="relative min-h-screen">
         <Image
@@ -135,7 +135,7 @@ export default function AutoDealerLanding() {
         <Header />
 
         <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 pt-20 lg:pt-32">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 lg:pt-10">
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -199,7 +199,7 @@ export default function AutoDealerLanding() {
           </div>
 
           {/* Search / Filter Card */}
-          <Card className="bg-white/10 border-white/20 backdrop-blur-md text-white p-6 sm:p-10 rounded-xl mt-5">
+          <Card className="bg-white/10 border-white/20 backdrop-blur-md text-white p-6 sm:p-10 rounded-xl my-5">
             <CardContent className="space-y-4">
               <p className="text-2xl sm:text-2xl font-semibold mb-4">
                 Find your perfect car
@@ -269,7 +269,7 @@ export default function AutoDealerLanding() {
         </div>
 
         {/* Scroll Down Indicator */}
-        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+        <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
