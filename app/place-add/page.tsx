@@ -162,7 +162,7 @@ export default function PlaceAddForm() {
 
       // Add images to FormData
       data.images.forEach((image, index) => {
-        formDataToSubmit.append(`image_${index}`, image);
+        formDataToSubmit.append(`images`, image);
       });
 
       // Store in IndexedDB

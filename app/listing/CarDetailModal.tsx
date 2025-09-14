@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Heart, Gauge, Fuel, Palette, Car } from "lucide-react";
+import { X, Heart, Gauge, Fuel, Palette, Car, Bluetooth } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Image from "next/image";
@@ -25,6 +25,7 @@ interface CarData {
   bodyStyle: string;
   doors: number;
   vin: string;
+  blueetooth?: boolean;
 }
 
 interface CarListingModalProps {
@@ -211,6 +212,18 @@ export function CarDetailModal({ car, isOpen, onClose }: CarListingModalProps) {
                     Fuel type
                   </div>
                   <div className="text-sm text-gray-600">{car.fuelType}</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                  <Bluetooth className="size-6 text-gray-600" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-900">
+                    Blueetooth
+                  </div>
+                  {/* <div className="text-sm text-gray-600">{car.fuelType}</div> */}
                 </div>
               </div>
             </div>

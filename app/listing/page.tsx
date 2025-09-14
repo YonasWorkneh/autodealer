@@ -661,6 +661,7 @@ export default function CarMarketplace() {
             bodyStyle: "SUV",
             doors: 4,
             vin: "KNMAT2MV0HP518223",
+            blueetooth: true,
           }}
           onClose={() => setDetailOpened(false)}
         />
