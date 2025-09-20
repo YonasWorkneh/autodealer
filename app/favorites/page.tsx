@@ -77,7 +77,7 @@ export default function FavoritesPage() {
   return (
     <>
       <Header color="black" />
-      <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-8 bg-white min-h-screen">
+      <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-50 py-8 bg-white min-h-screen">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-semibold text-black">

@@ -62,7 +62,7 @@ export default function CarListingPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <Header color="black" />
-      <div className="px-0 sm:px-6 lg:px-40 py-6 md:py-10">
+      <div className="px-0 sm:px-6 lg:px-50 py-6 md:py-10">
         {/* Main Car Image */}
         <div className="relative mb-6">
           <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">

@@ -397,6 +397,7 @@ import {
 import Header from "@/components/Header";
 import Link from "next/link";
 import { CarDetailModal } from "./CarDetailModal";
+import { useMakes, useModels } from "@/hooks/cars";
 
 export default function CarMarketplace() {
   const [detailOpened, setDetailOpened] = useState(false);
@@ -487,7 +488,7 @@ export default function CarMarketplace() {
     <div className="min-h-screen bg-white">
       <Header color="black" />
 
-      <div className="pt-16 px-4 sm:px-6 lg:px-40">
+      <div className="pt-16 px-4 sm:px-6 lg:px-50">
         {/* Mobile Filter Button */}
         <div className="sm:hidden mb-4 flex justify-end">
           <Button
@@ -556,7 +557,7 @@ export default function CarMarketplace() {
                   href={"/listing/gibberish"}
                   className="block relative"
                 >
-                  <Card className="border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
+                  <Card className="shadow-none border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
                     <CardContent className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
                       {/* Image */}
                       <div className="relative">
@@ -672,8 +673,12 @@ export default function CarMarketplace() {
 
 // Sidebar Filters Component
 function FilterSidebar({ close }: { close?: () => void }) {
+  const { data: makes, isLoading: isMakesLoading } = useMakes();
+  const { data: models, isLoading: isModelsLoading } = useModels();
+  const [make, setMake] = useState<number>();
+  const [model, setModel] = useState<number>();
   return (
-    <Card className="mb-6 sticky top-0 bg-white z-40">
+    <Card className="mb-6 sticky top-0 bg-white z-40 shadow-none">
       <CardContent className="p-4 sm:p-6 space-y-6">
         <Button
           variant="outline"
@@ -690,26 +695,39 @@ function FilterSidebar({ close }: { close?: () => void }) {
             Make & Model
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            <Select>
+            <Select onValueChange={(value) => setMake(+value)}>
               <SelectTrigger className="border-gray-300 w-full !h-[50px] !rounded-sm">
                 <SelectValue placeholder="Make" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="jeep">Jeep</SelectItem>
-                <SelectItem value="kia">Kia</SelectItem>
-                <SelectItem value="chevrolet">Chevrolet</SelectItem>
+                {makes?.map((make) =>
+                  isMakesLoading ? (
+                    <SelectItem value={`loading`} disabled>
+                      loading...
+                    </SelectItem>
+                  ) : (
+                    <SelectItem value={`${make.id}`}>{make.name}</SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
-            <Select>
+            <Select
+              disabled={make === undefined}
+              onValueChange={(value) => setModel(+value)}
+            >
               <SelectTrigger className="border-gray-300 w-full !h-[50px] !rounded-sm">
                 <SelectValue placeholder="Model" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="jeep">1 series</SelectItem>
-                <SelectItem value="kia">2 series</SelectItem>
-                <SelectItem value="chevrolet">3 series</SelectItem>
+                {models?.map((model) =>
+                  isModelsLoading ? (
+                    <SelectItem value={`loading`} disabled>
+                      loading...
+                    </SelectItem>
+                  ) : (
+                    <SelectItem value={`${model.id}`}>{model.name}</SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
           </div>

@@ -1,4 +1,3 @@
-// hooks/useCar.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchCars,
@@ -6,8 +5,12 @@ import {
   fetchMakes,
   fetchModels,
   postCar,
+  getMyAds,
+  deleteCar,
 } from "@/lib/carApi";
 import type { Car } from "@/app/types/Car";
+import { useToast } from "./use-toast";
+// const { user } = useUserStore();
 
 export function useCars() {
   return useQuery({
@@ -32,7 +35,6 @@ export function useMakes() {
 }
 
 export function useModels(makeId?: number) {
-  // console.log("makeId", makeId);
   return useQuery({
     queryKey: ["models", makeId],
     queryFn: () => fetchModels(makeId),
@@ -40,14 +42,61 @@ export function useModels(makeId?: number) {
   });
 }
 
-export function usePostCar() {
+export function usePostCar(onError?: () => void, onSuccess?: () => void) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (car: Car) => postCar(car),
+    mutationFn: (formData: FormData) => postCar(formData),
+    onError: () => {
+      onError?.();
+    },
     onSuccess: () => {
       // refresh list of cars after posting
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["cars"] });
+      queryClient.invalidateQueries({ queryKey: ["my-ads"] });
+    },
+  });
+}
+
+export function useMyAds(id: number | undefined) {
+  return useQuery({
+    queryKey: ["my-ads"],
+    queryFn: () => getMyAds(id),
+    enabled: id !== undefined,
+  });
+}
+
+export function useUpdateCar(onError?: () => void, onSuccess?: () => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData: FormData) => postCar(formData),
+    onError: () => {
+      console.log("error");
+      onError?.();
+    },
+    onSuccess: () => {
+      // refresh list of cars after posting
+      onSuccess?.();
       queryClient.invalidateQueries({ queryKey: ["cars"] });
     },
+  });
+}
+
+export function useDeleteCar(onError?: () => void, onSuccess?: () => void) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteCar(id),
+    onError: (err) => {
+      console.log("error", err);
+      onError?.();
+    },
+    onSuccess: (data) => {
+      console.log("data", data);
+      onSuccess?.();
+    },
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ["my-ads", "cars"] }),
   });
 }

@@ -135,7 +135,7 @@ export default function AutoDealerLanding() {
         <Header />
 
         <div className="relative z-10 px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40">
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 pt-10">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 pt-20">
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -215,7 +215,7 @@ export default function AutoDealerLanding() {
                 />
                 <SearchableDropdown
                   items={
-                    models?.map((model) => ({
+                    models?.filter((model:any)=>model.make.id === filters.make)?.map((model:any) => ({
                       value: model.id,
                       label: model.name,
                     })) ?? []
@@ -269,7 +269,7 @@ export default function AutoDealerLanding() {
         </div>
 
         {/* Scroll Down Indicator */}
-        <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}

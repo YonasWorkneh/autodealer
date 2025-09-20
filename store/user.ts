@@ -9,6 +9,8 @@ type UserStore = {
   is_staff?: boolean;
   is_superuser?: boolean;
   contact?: string;
+  role?: string;
+  pk?: number;
 };
 
 type UserState = {

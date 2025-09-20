@@ -48,7 +48,7 @@ export default function SignIn() {
   };
 
   return (
-    <Card className="w-[450px]">
+    <Card className="w-[380px] md:w-[450px]">
       <CardHeader>
         <Link
           href={"/"}

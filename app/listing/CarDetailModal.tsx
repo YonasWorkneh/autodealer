@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Image from "next/image";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import Link from "next/link";
 
 interface CarData {
   id: string;
@@ -91,12 +92,15 @@ export function CarDetailModal({ car, isOpen, onClose }: CarListingModalProps) {
         <div className="px-6 pb-4 mt-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900">KEY DETAILS</h3>
-            <Button className="text-sm font-medium text-white cursor-pointer flex items-center gap-1 group w-[130px]">
+            <Link
+              href={`listing/${car.id}`}
+              className="text-sm font-medium text-white bg-zinc-800 hover:bg-zinc-900 cursor-pointer flex items-center gap-1 group p-4 py-2 rounded-sm"
+            >
               <span>View more</span>
               <span className="group-hover:translate-x-1 transition-all">
                 →
               </span>
-            </Button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

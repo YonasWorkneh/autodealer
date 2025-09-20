@@ -19,7 +19,6 @@ export const signin = async (data: SignInParams) => {
     });
     if (!res.ok) throw new Error("Something went wrong");
     const user = await res.json();
-    console.log(user);
     if (!user.access)
       throw new Error("Error trying to log you in. Please try again.");
     const cookiess = await cookies();
@@ -59,7 +58,6 @@ export const signin = async (data: SignInParams) => {
 };
 
 export const getUser = async () => {
-  console.log("called");
   const cookiess = await cookies();
   const refresh = cookiess.get("refresh")?.value;
   try {
@@ -119,4 +117,36 @@ export const forgotPassword = async (email: string) => {
     console.error(err.message);
     throw err;
   }
+};
+
+export const getUserRole = async () => {
+   const cookiess = await cookies();
+   const refresh = cookiess.get("refresh")?.value;
+   try {
+     if (!refresh) throw new Error("User is not logged in.");
+     const response = await fetch(
+       `${process.env.BASE_API_URL}/auth/token/refresh/`,
+       {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ refresh }),
+       }
+     );
+     if (!response.ok) throw new Error("Error fetching refresh token");
+     const ref = await response.json();
+     const access = ref.access;
+     const newRefresh = ref.refresh;
+     if (!ref.access) throw new Error(`${JSON.stringify(ref)}`);
+     const res = await fetch(`${process.env.BASE_API_URL}/users/profiles/me/`, {
+       headers: {
+         Authorization: `Bearer ${access}`,
+       },
+     });
+     if (!res.ok) throw new Error("Something went wrong");
+     const user = await res.json();
+     if (!user.email) throw new Error(`refresh ${refresh}`);
+     return user;
+   } catch (err: any) {
+     throw err;
+   }
 };

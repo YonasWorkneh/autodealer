@@ -22,6 +22,7 @@ export default function SavedFormsPage() {
     try {
       setLoading(true);
       const forms = await indexedDBManager.getAllCarForms();
+      console.log(forms);
       setSavedForms(forms);
     } catch (err) {
       setError(

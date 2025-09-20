@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { signup } from "@/lib/auth/signup";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -26,16 +28,24 @@ export default function SignIn() {
   const { handleSubmit, register, formState } = useForm();
   const { errors } = formState;
   const [err, setErr] = useState("");
+  const { toast } = useToast();
+  const router = useRouter();
 
   const onSubmit = async (data: any) => {
     try {
       setLoading(true);
       setErr("");
-      console.log({ ...data, password2: data.password1 });
       const user = await signup({ ...data, password2: data.password1 });
-      console.log(user);
+      toast({
+        title: "✅ Sign up Success",
+        description: "Signed up succesfully. log into your account.",
+      });
+      router.push("/signin");
     } catch (err) {
-      setErr("Something went wrong");
+      toast({
+        title: "❌ Registration Failed",
+        description: "Failed to register your account. Please try again.",
+      });
     } finally {
       setLoading(false);
     }

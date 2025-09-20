@@ -19,6 +19,7 @@ export interface CarFormData {
   salesType: string;
   description: string;
   images: File[];
+  status: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -218,21 +219,23 @@ export const indexedDBManager = new IndexedDBManager();
 // Helper function to convert FormData to our interface
 export function convertFormDataToCarForm(
   formData: FormData,
-  images: File[]
+  images: File[],
+  status: string
 ): Omit<CarFormData, "id" | "createdAt" | "updatedAt"> {
   return {
-    make: Number(formData.get("make")),
-    model: Number(formData.get("model")),
+    make: Number(formData.get("make_ref")),
+    model: Number(formData.get("model_ref")),
     year: formData.get("year") as string,
     mileage: formData.get("mileage") as string,
     engine: formData.get("engine") as string,
     gearbox: formData.get("gearbox") as string,
-    bodyColor: formData.get("bodyColor") as string,
-    interiorColor: formData.get("interiorColor") as string,
-    fuelType: formData.get("fuelType") as string,
+    bodyColor: formData.get("exterior_color") as string,
+    interiorColor: formData.get("interior_color") as string,
+    fuelType: formData.get("fuel_type") as string,
     price: formData.get("price") as string,
     salesType: formData.get("salesType") as string,
     description: formData.get("description") as string,
     images: images,
+    status,
   };
 }

@@ -1,11 +1,10 @@
 "use server";
-import type { Car } from "@/app/types/Car"; // move your interfaces to a types file for reusability
+import type { Car, FetchedCar } from "@/app/types/Car"; // move your interfaces to a types file for reusability
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
 import { cookies } from "next/headers";
 
 const BASE_URL = process.env.BASE_API_URL as string;
-console.log("baseurl", BASE_URL);
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -14,6 +13,7 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
       ...(options?.headers || {}),
     },
   });
+  console.log(res);
 
   if (!res.ok) {
     throw new Error(`API error: ${res.status} ${res.statusText}`);
@@ -37,8 +37,13 @@ export async function fetchCars(): Promise<Car[]> {
   });
 }
 
-export async function fetchCarById(id: string): Promise<Car> {
-  return fetcher<Car>(`/inventory/cars/${id}`);
+export async function fetchCarById(id: string): Promise<FetchedCar> {
+  const credential = await credentials();
+  return fetcher<FetchedCar>(`/inventory/cars/${id}`, {
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
 }
 
 export async function fetchMakes(): Promise<Make[]> {
@@ -62,31 +67,42 @@ export async function fetchModels(makeId?: number): Promise<Model[]> {
   });
 }
 
-export async function postCar(car: Car): Promise<Car> {
-  const formData = new FormData();
-
-  // Add all fields except images
-  Object.keys(car).forEach((key) => {
-    if (key !== "images" && car[key as keyof Car] !== undefined) {
-      formData.append(key, String(car[key as keyof Car]));
-    }
-  });
-
-  // Add images
-  if (car.images && car.images.length > 0) {
-    car.images.forEach((image, index) => {
-      if (image.image_url) {
-        formData.append(`images`, {
-          uri: image.image_url,
-          type: "image/jpeg",
-          name: `car_image_${index}.jpg`,
-        } as any);
-      }
-    });
-  }
+export async function postCar(formData: FormData): Promise<Car> {
+  const credential = await credentials();
 
   return fetcher<Car>("/inventory/cars/", {
     method: "POST",
     body: formData,
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
   });
+}
+
+export async function getMyAds(id: number | undefined) {
+  if (!id) return [];
+  const credential = await credentials();
+  const myAds = await fetcher<FetchedCar[]>("/inventory/cars/", {
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
+  return myAds.filter((car) => car.broker === id);
+}
+
+export async function deleteCar(id: number) {
+  const credential = await credentials();
+  const res = await fetch(`${BASE_URL}/inventory/cars/${id}/`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${credential.access}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Delete failed: ${res.status} ${res.statusText}`);
+  }
+
+  // Return something serializable (plain object)
+  return { success: true, id };
 }

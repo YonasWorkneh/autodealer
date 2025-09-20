@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,13 +16,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { Plus, Eye, ChevronDown, ChevronUp } from "lucide-react";
-import { useMakes, useModels } from "@/hooks/cars";
+import { Plus, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import {
+  useMakes,
+  useModels,
+  usePostCar,
+  useCar,
+  useUpdateCar,
+} from "@/hooks/cars";
 import Header from "@/components/Header";
 import { indexedDBManager, convertFormDataToCarForm } from "@/lib/indexedDB";
-import Link from "next/link";
 import type { Feature } from "../types/Car";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useUserStore } from "@/store/user";
+import Loading from "../loading";
+import { useProfile } from "@/hooks/profile";
 
 // Validation schema
 const formSchema = z.object({
@@ -45,17 +54,21 @@ const formSchema = z.object({
   salesType: z.string().min(1, "Sales type is required"),
   description: z.string().min(1, "Description is required"),
   images: z.array(z.instanceof(File)).min(1, "At least one image is required"),
+  bodyType: z.string().min(1, "Body type is required"),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 export default function PlaceAddForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const c_id = searchParams.get("c_id");
+  const { user } = useUserStore();
+  const { data: profile } = useProfile();
   const [step, setStep] = useState(1);
   const [images, setImages] = useState<File[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
   const {
     control,
     handleSubmit,
@@ -63,6 +76,7 @@ export default function PlaceAddForm() {
     trigger,
     setValue,
     watch,
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
@@ -80,14 +94,81 @@ export default function PlaceAddForm() {
       salesType: "",
       description: "",
       images: [],
+      bodyType: "",
     },
   });
 
   const watchedMake = watch("make");
   const { data: makes, isLoading: isMakesLoading } = useMakes();
-  const { data: models, isLoading: isModelsLoading } = useModels(
-    watchedMake > 0 ? watchedMake : undefined
-  );
+  const { data: models, isLoading: isModelsLoading } = useModels(watchedMake);
+  const { data: carData, isLoading: isCarLoading } = useCar(c_id ? c_id : "");
+
+  console.log("carData", carData);
+
+  const onSuccess = () => {
+    reset({
+      make: 0,
+      model: 0,
+      year: "",
+      mileage: "",
+      engine: "",
+      gearbox: "",
+      bodyColor: "",
+      interiorColor: "",
+      fuelType: "",
+      price: "",
+      salesType: "",
+      description: "",
+      images: [],
+      bodyType: "",
+    });
+    setImages([]);
+    setTechnicalFeatures((prev) =>
+      prev.map((tec) => ({ ...tec, checked: false }))
+    );
+    setExtras((prev) => prev.map((extra) => ({ ...extra, checked: false })));
+    setStep(1);
+    setSubmitSuccess(true);
+    setTimeout(() => setSubmitSuccess(false), 5000);
+  };
+
+  const onError = () => {
+    reset({
+      make: 0,
+      model: 0,
+      year: "",
+      mileage: "",
+      engine: "",
+      gearbox: "",
+      bodyColor: "",
+      interiorColor: "",
+      fuelType: "",
+      price: "",
+      salesType: "",
+      description: "",
+      images: [],
+      bodyType: "",
+    });
+    setImages([]);
+    setTechnicalFeatures((prev) =>
+      prev.map((tec) => ({ ...tec, checked: false }))
+    );
+    setExtras((prev) => prev.map((extra) => ({ ...extra, checked: false })));
+    setStep(1);
+    setSubmitError("Something went wrong. Please try again");
+    setTimeout(() => setSubmitError(null), 5000);
+  };
+
+  const {
+    mutate: postCar,
+    isPending: isPostPending,
+    isSuccess: isPostSuccess,
+  } = usePostCar(onError, onSuccess);
+  const {
+    mutate: updateCar,
+    isPending: isUpdatePending,
+    isSuccess: isUpdateSuccess,
+  } = useUpdateCar(onError, onSuccess);
 
   // Generate years from 1921 to current year
   const currentYear = new Date().getFullYear();
@@ -96,16 +177,7 @@ export default function PlaceAddForm() {
     (_, i) => currentYear - i
   );
 
-  const fuelTypes = [
-    "Petrol",
-    "Diesel",
-    "Electric",
-    "Hybrid",
-    "Plug-in Hybrid",
-    "CNG",
-    "LPG",
-    "Hydrogen",
-  ];
+  const fuelTypes = ["Diesel", "Electric", "Hybrid", "Petrol"];
   const engineTypes = [
     "Inline-3",
     "Inline-4",
@@ -119,9 +191,358 @@ export default function PlaceAddForm() {
     "Turbocharged",
     "Supercharged",
     "Naturally Aspirated",
+    "Other",
   ];
-  const gearboxTypes = ["Manual", "Automatic", "CVT", "Semi-Automatic"];
+  const bodyTypes: { value: string; label: string }[] = [
+    { value: "sedan", label: "Sedan" },
+    { value: "suv", label: "SUV" },
+    { value: "truck", label: "Truck" },
+    { value: "coupe", label: "Coupe" },
+    { value: "hatchback", label: "Hatchback" },
+    { value: "convertible", label: "Convertible" },
+    { value: "wagon", label: "Wagon" },
+    { value: "van", label: "Van" },
+    { value: "other", label: "Other" },
+  ];
+  const gearboxTypes = [
+    "Manual",
+    "Automatic",
+    "CVT",
+    "Semi-Automatic",
+    "Other",
+  ];
   const salesTypes = ["Auction", "Fixed Price"];
+  const [technicalFeatures, setTechnicalFeatures] = useState<Feature[]>([
+    {
+      id: "tiptronic",
+      label: "Tiptronic Gears",
+      checked: false,
+      field: "tiptronic_gears",
+    },
+    {
+      id: "front-airbags",
+      label: "Front Airbags",
+      checked: false,
+      field: "front_airbags",
+    },
+    {
+      id: "dual-exhaust",
+      label: "Dual Exhaust",
+      checked: false,
+      field: "dual_exhaust",
+    },
+    {
+      id: "side-airbags",
+      label: "Side Airbags",
+      checked: false,
+      field: "side_airbags",
+    },
+    {
+      id: "power-steering",
+      label: "Power Steering",
+      checked: false,
+      field: "power_steering",
+    },
+    {
+      id: "n2o-system",
+      label: "N2O System",
+      checked: false,
+      field: "n2o_system",
+    },
+    {
+      id: "cruise-control",
+      label: "Cruise Control",
+      checked: false,
+      field: "cruise_control",
+    },
+    {
+      id: "front-wheel-drive",
+      label: "Front Wheel Drive",
+      checked: false,
+      field: "front_wheel_drive",
+    },
+    {
+      id: "rear-wheel-drive",
+      label: "Rear Wheel Drive",
+      checked: false,
+      field: "rear_wheel_drive",
+    },
+    {
+      id: "4-wheel-drive",
+      label: "4 Wheel Drive",
+      checked: false,
+      field: "four_wheel_drive",
+    },
+    {
+      id: "all-wheel-steering",
+      label: "All Wheel Steering",
+      checked: false,
+      field: "all_wheel_steering",
+    },
+    {
+      id: "anti-lock-brakes",
+      label: "Anti-Lock Brakes/ABS",
+      checked: false,
+      field: "anti_lock_brakes",
+    },
+    {
+      id: "all-wheel-drive",
+      label: "All Wheel Drive",
+      checked: false,
+      field: "all_wheel_drive",
+    },
+  ]);
+
+  const [extras, setExtras] = useState<Feature[]>([
+    {
+      id: "bluetooth-system",
+      label: "Bluetooth System",
+      checked: false,
+      field: "bluetooth",
+    },
+    {
+      id: "heated-seats",
+      label: "Heated Seats",
+      checked: false,
+      field: "heated_seats",
+    },
+    { id: "cd-player", label: "CD Player", checked: false, field: "cd_player" },
+    {
+      id: "power-locks",
+      label: "Power Locks",
+      checked: false,
+      field: "power_locks",
+    },
+    {
+      id: "premium-wheels",
+      label: "Premium Wheels/Rims",
+      checked: false,
+      field: "premium_wheels_rims",
+    },
+    { id: "winch", label: "Winch", checked: false, field: "winch" },
+    {
+      id: "alarm",
+      label: "Alarm/Anti-Theft System",
+      checked: false,
+      field: "alarm_anti_theft",
+    },
+    {
+      id: "cooled-seats",
+      label: "Cooled Seats",
+      checked: false,
+      field: "cooled_seats",
+    },
+    {
+      id: "keyless-start",
+      label: "Keyless Start",
+      checked: false,
+      field: "keyless_start",
+    },
+    { id: "body-kit", label: "Body Kit", checked: false, field: "body_kit" },
+    {
+      id: "navigation",
+      label: "Navigation System",
+      checked: false,
+      field: "navigation_system",
+    },
+    {
+      id: "premium-lights",
+      label: "Premium Lights",
+      checked: false,
+      field: "premium_lights",
+    },
+    {
+      id: "cassette-player",
+      label: "Cassette Player",
+      checked: false,
+      field: "cassette_player",
+    },
+    {
+      id: "fog-lights",
+      label: "Fog Lights",
+      checked: false,
+      field: "fog_lights",
+    },
+    {
+      id: "leather-seats",
+      label: "Leather Seats",
+      checked: false,
+      field: "leather_seats",
+    },
+    { id: "roof-rack", label: "Roof Rack", checked: false, field: "roof_rack" },
+    {
+      id: "dvd-player",
+      label: "DVD Player",
+      checked: false,
+      field: "dvd_player",
+    },
+    {
+      id: "power-mirrors",
+      label: "Power Mirrors",
+      checked: false,
+      field: "power_mirrors",
+    },
+    {
+      id: "power-sunroof",
+      label: "Power Sunroof",
+      checked: false,
+      field: "power_sunroof",
+    },
+    {
+      id: "aux-audio-in",
+      label: "Aux Audio In",
+      checked: false,
+      field: "aux_audio_in",
+    },
+    {
+      id: "brush-guard",
+      label: "Brush Guard",
+      checked: false,
+      field: "brush_guard",
+    },
+    {
+      id: "air-conditioning",
+      label: "Air Conditioning",
+      checked: false,
+      field: "air_conditioning",
+    },
+    {
+      id: "performance-tyres",
+      label: "Performance Tyres",
+      checked: false,
+      field: "performance_tyres",
+    },
+    {
+      id: "premium-sound",
+      label: "Premium Sound System",
+      checked: false,
+      field: "premium_sound_system",
+    },
+    { id: "heat", label: "Heat", checked: false, field: "heat" },
+    {
+      id: "vhs-player",
+      label: "VHS Player",
+      checked: false,
+      field: "vhs_player",
+    },
+    {
+      id: "offroad-kit",
+      label: "Off-Road Kit",
+      checked: false,
+      field: "off_road_kit",
+    },
+    {
+      id: "am-fm-radio",
+      label: "AM/FM Radio",
+      checked: false,
+      field: "am_fm_radio",
+    },
+    { id: "moonroof", label: "Moonroof", checked: false, field: "moonroof" },
+    {
+      id: "racing-seats",
+      label: "Racing Seats",
+      checked: false,
+      field: "racing_seats",
+    },
+    {
+      id: "premium-paint",
+      label: "Premium Paint",
+      checked: false,
+      field: "premium_paint",
+    },
+    { id: "spoiler", label: "Spoiler", checked: false, field: "spoiler" },
+    {
+      id: "power-windows",
+      label: "Power Windows",
+      checked: false,
+      field: "power_windows",
+    },
+    { id: "sunroof", label: "Sunroof", checked: false, field: "sunroof" },
+    {
+      id: "climate-control",
+      label: "Climate Control",
+      checked: false,
+      field: "climate_control",
+    },
+    {
+      id: "parking-sensors",
+      label: "Parking Sensors",
+      checked: false,
+      field: "parking_sensors",
+    },
+    {
+      id: "rear-view-camera",
+      label: "Rear View Camera",
+      checked: false,
+      field: "rear_view_camera",
+    },
+    {
+      id: "keyless-entry",
+      label: "Keyless Entry",
+      checked: false,
+      field: "keyless_entry",
+    },
+    {
+      id: "offroad-tyres",
+      label: "Off-Road Tyres",
+      checked: false,
+      field: "off_road_tyres",
+    },
+    {
+      id: "satellite-radio",
+      label: "Satellite Radio",
+      checked: false,
+      field: "satellite_radio",
+    },
+    {
+      id: "power-seats",
+      label: "Power Seats",
+      checked: false,
+      field: "power_seats",
+    },
+  ]);
+
+  // Pre-fill form with car data when c_id is present
+  useEffect(() => {
+    if (carData && c_id) {
+      console.log("Setting form with carData:", carData);
+      setTimeout(() => {
+        reset({
+          make: carData.make_ref,
+          model: carData.model_ref,
+          year: carData.year.toString(),
+          mileage: carData.mileage.toString(),
+          engine: carData.engine,
+          gearbox: carData.drivetrain === "fwd" ? "Manual" : carData.drivetrain,
+          bodyColor: carData.exterior_color,
+          interiorColor: carData.interior_color,
+          fuelType: carData.fuel_type?.toLowerCase() || carData.fuel_type,
+          price: carData.price.toString(),
+          salesType:
+            carData.sale_type === "fixed_price" ? "Fixed Price" : "Auction",
+          description: carData.description,
+          bodyType: carData.body_type,
+          images: [],
+        });
+
+        // Set technical features
+        setTechnicalFeatures((prev) =>
+          prev.map((feature) => ({
+            ...feature,
+            checked: (carData as any)[feature.field] || false,
+          }))
+        );
+
+        // Set extras
+        setExtras((prev) =>
+          prev.map((extra) => ({
+            ...extra,
+            checked: (carData as any)[extra.field] || false,
+          }))
+        );
+      }, 1000);
+    }
+  }, [carData, c_id, reset]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -137,58 +558,6 @@ export default function PlaceAddForm() {
     setValue("images", newImages);
   };
 
-  const onSubmit = async (data: FormData) => {
-    setIsSubmitting(true);
-    setSubmitError(null);
-    setSubmitSuccess(false);
-
-    try {
-      // Create FormData for API submission (if needed)
-      const formDataToSubmit = new FormData();
-
-      // Add all form fields to FormData
-      formDataToSubmit.append("make", data.make.toString());
-      formDataToSubmit.append("model", data.model.toString());
-      formDataToSubmit.append("year", data.year);
-      formDataToSubmit.append("mileage", data.mileage);
-      formDataToSubmit.append("engine", data.engine);
-      formDataToSubmit.append("gearbox", data.gearbox);
-      formDataToSubmit.append("bodyColor", data.bodyColor);
-      formDataToSubmit.append("interiorColor", data.interiorColor);
-      formDataToSubmit.append("fuelType", data.fuelType);
-      formDataToSubmit.append("price", data.price);
-      formDataToSubmit.append("salesType", data.salesType);
-      formDataToSubmit.append("description", data.description);
-
-      // Add images to FormData
-      data.images.forEach((image, index) => {
-        formDataToSubmit.append(`images`, image);
-      });
-
-      // Store in IndexedDB
-      const carFormData = convertFormDataToCarForm(
-        formDataToSubmit,
-        data.images
-      );
-      const savedId = await indexedDBManager.saveCarForm(carFormData);
-
-      // console.log("Form data saved to IndexedDB with ID:", savedId);
-      // console.log("Form submitted with data:", formDataToSubmit);
-
-      setSubmitSuccess(true);
-
-      // Here you would typically send the formDataToSubmit to your API
-      // await submitToAPI(formDataToSubmit);
-    } catch (error) {
-      console.error("Error saving form data:", error);
-      setSubmitError(
-        error instanceof Error ? error.message : "Failed to save form data"
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleNext = async () => {
     const fieldsToValidate =
       step === 1
@@ -201,8 +570,10 @@ export default function PlaceAddForm() {
             "gearbox",
             "bodyColor",
             "interiorColor",
+            "fuelType",
+            "bodyType",
           ]
-        : ["fuelType", "price", "salesType", "description", "images"];
+        : ["price", "salesType", "description", "images"];
 
     const isValid = await trigger(fieldsToValidate as any);
     if (isValid) {
@@ -212,66 +583,6 @@ export default function PlaceAddForm() {
 
   const [showAllTechnical, setShowAllTechnical] = useState(false);
   const [showAllExtras, setShowAllExtras] = useState(false);
-
-  const [technicalFeatures, setTechnicalFeatures] = useState<Feature[]>([
-    { id: "tiptronic", label: "Tiptronic Gears", checked: false },
-    { id: "front-airbags", label: "Front Airbags", checked: false },
-    { id: "dual-exhaust", label: "Dual Exhaust", checked: false },
-    { id: "side-airbags", label: "Side Airbags", checked: false },
-    { id: "power-steering", label: "Power Steering", checked: false },
-    { id: "n2o-system", label: "N2O System", checked: false },
-    { id: "cruise-control", label: "Cruise Control", checked: false },
-    { id: "front-wheel-drive", label: "Front Wheel Drive", checked: false },
-    { id: "rear-wheel-drive", label: "Rear Wheel Drive", checked: false },
-    { id: "4-wheel-drive", label: "4 Wheel Drive", checked: false },
-    { id: "all-wheel-steering", label: "All Wheel Steering", checked: false },
-    { id: "anti-lock-brakes", label: "Anti-Lock Brakes/ABS", checked: false },
-    { id: "all-wheel-drive", label: "All Wheel Drive", checked: false },
-  ]);
-
-  const [extras, setExtras] = useState<Feature[]>([
-    { id: "bluetooth-system", label: "Bluetooth System", checked: false },
-    { id: "heated-seats", label: "Heated Seats", checked: false },
-    { id: "cd-player", label: "CD Player", checked: false },
-    { id: "power-locks", label: "Power Locks", checked: false },
-    { id: "premium-wheels", label: "Premium Wheels/Rims", checked: false },
-    { id: "winch", label: "Winch", checked: false },
-    { id: "alarm", label: "Alarm/Anti-Theft System", checked: false },
-    { id: "cooled-seats", label: "Cooled Seats", checked: false },
-    { id: "keyless-start", label: "Keyless Start", checked: false },
-    { id: "body-kit", label: "Body Kit", checked: false },
-    { id: "navigation", label: "Navigation System", checked: false },
-    { id: "premium-lights", label: "Premium Lights", checked: false },
-    { id: "cassette-player", label: "Cassette Player", checked: false },
-    { id: "fog-lights", label: "Fog Lights", checked: false },
-    { id: "leather-seats", label: "Leather Seats", checked: false },
-    { id: "roof-rack", label: "Roof Rack", checked: false },
-    { id: "dvd-player", label: "DVD Player", checked: false },
-    { id: "power-mirrors", label: "Power Mirrors", checked: false },
-    { id: "power-sunroof", label: "Power Sunroof", checked: false },
-    { id: "aux-audio-in", label: "Aux Audio In", checked: false },
-    { id: "brush-guard", label: "Brush Guard", checked: false },
-    { id: "air-conditioning", label: "Air Conditioning", checked: false },
-    { id: "performance-tyres", label: "Performance Tyres", checked: false },
-    { id: "premium-sound", label: "Premium Sound System", checked: false },
-    { id: "heat", label: "Heat", checked: false },
-    { id: "vhs-player", label: "VHS Player", checked: false },
-    { id: "offroad-kit", label: "Off-Road Kit", checked: false },
-    { id: "am-fm-radio", label: "AM/FM Radio", checked: false },
-    { id: "moonroof", label: "Moonroof", checked: false },
-    { id: "racing-seats", label: "Racing Seats", checked: false },
-    { id: "premium-paint", label: "Premium Paint", checked: false },
-    { id: "spoiler", label: "Spoiler", checked: false },
-    { id: "power-windows", label: "Power Windows", checked: false },
-    { id: "sunroof", label: "Sunroof", checked: false },
-    { id: "climate-control", label: "Climate Control", checked: false },
-    { id: "parking-sensors", label: "Parking Sensors", checked: false },
-    { id: "rear-view-camera", label: "Rear View Camera", checked: false },
-    { id: "keyless-entry", label: "Keyless Entry", checked: false },
-    { id: "offroad-tyres", label: "Off-Road Tyres", checked: false },
-    { id: "satellite-radio", label: "Satellite Radio", checked: false },
-    { id: "power-seats", label: "Power Seats", checked: false },
-  ]);
 
   const handleTechnicalFeatureChange = (id: string, checked: boolean) => {
     setTechnicalFeatures((prev) =>
@@ -292,6 +603,96 @@ export default function PlaceAddForm() {
     : technicalFeatures.slice(0, 6);
   const visibleExtras = showAllExtras ? extras : extras.slice(0, 4);
 
+  const onSubmit = async (data: FormData) => {
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    try {
+      // Create FormData for API submission
+      const carForm = new FormData();
+
+      // Add all form fields to FormData
+      carForm.append("make_ref", data.make.toString());
+      carForm.append("model_ref", data.model.toString());
+      carForm.append("year", data.year);
+      carForm.append("mileage", data.mileage);
+      carForm.append("engine", data.engine);
+      carForm.append("gearbox", data.gearbox);
+      carForm.append("exterior_color", data.bodyColor);
+      carForm.append("interior_color", data.interiorColor);
+      carForm.append("fuel_type", data.fuelType);
+      carForm.append("price", data.price);
+      carForm.append(
+        "sales_type",
+        data.salesType === "Fixed Price" ? "fixed_price" : "auction"
+      );
+      carForm.append("description", data.description);
+      carForm.append("body_type", data.bodyType);
+
+      // Add images to FormData
+      data.images.forEach((image, index) => {
+        carForm.append(`uploaded_images[${index}].image_file`, image);
+        carForm.append(
+          `uploaded_images[${index}].is_featured`,
+          String(index === 0 ? "True" : "False")
+        );
+        // caption = file name
+        carForm.append(`uploaded_images[${index}].caption`, image.name);
+      });
+
+      const selectedTechnical = technicalFeatures.filter((tec) => tec.checked);
+      const selectedExtras = extras.filter((extra) => extra.checked);
+      selectedTechnical.forEach((technical) =>
+        carForm.append(technical.field, String(technical.checked))
+      );
+      selectedExtras.forEach((extra) =>
+        carForm.append(extra.field, String(extra.checked))
+      );
+
+      if (
+        profile?.dealer_profile === null &&
+        profile?.broker_profile === null
+      ) {
+        // Store in IndexedDB
+        const carFormData = convertFormDataToCarForm(
+          carForm,
+          data.images,
+          "payment-pending"
+        );
+        const savedId = await indexedDBManager.saveCarForm(carFormData);
+        router.push(`/pricing?p_id=${savedId}`);
+      } else {
+        if (!profile?.dealer_profile) {
+          carForm.append("broker", String(profile?.broker_profile?.id));
+        } else {
+          carForm.append("dealer", String(profile?.dealer_profile?.id));
+        }
+
+        if (c_id) {
+          // Update existing car
+          carForm.append("id", c_id);
+          updateCar(carForm);
+        } else {
+          // Create new car
+          postCar(carForm);
+          console.log("CAr Form");
+          console.log(Object.fromEntries(carForm));
+        }
+      }
+    } catch (error) {
+      console.error("Error saving form data:", error);
+      setSubmitError(
+        error instanceof Error ? error.message : "Failed to save form data"
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (!user.email) router.push("/signin");
+  }, [user.email, router]);
+
+  if (!user.email || (c_id && isCarLoading)) return <Loading />;
+
   return (
     <div>
       <Header color="black" />
@@ -299,12 +700,12 @@ export default function PlaceAddForm() {
         <div className="w-full max-w-2xl bg-transparent rounded-lg p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-black/70 uppercase text-center">
-              Car Details Form
+              {c_id ? "Edit Car Details" : "Car Details Form"}
             </h1>
           </div>
 
           {/* Success Message */}
-          {submitSuccess && (
+          {(isPostSuccess || isUpdateSuccess) && submitSuccess && (
             <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -322,8 +723,9 @@ export default function PlaceAddForm() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium">
-                    Form submitted successfully! Your car details have been
-                    saved.
+                    {c_id
+                      ? "Car updated successfully!"
+                      : "Form submitted successfully! Your car has been posted."}
                   </p>
                 </div>
               </div>
@@ -367,7 +769,7 @@ export default function PlaceAddForm() {
                     control={control}
                     render={({ field }) => (
                       <Select
-                        value={field.value > 0 ? field.value.toString() : ""}
+                        value={field.value ? field.value.toString() : ""}
                         onValueChange={(value) => {
                           field.onChange(Number(value));
                           setValue("model", 0); // reset model when make changes
@@ -416,7 +818,7 @@ export default function PlaceAddForm() {
                     control={control}
                     render={({ field }) => (
                       <Select
-                        value={field.value > 0 ? field.value.toString() : ""}
+                        value={field.value ? field.value.toString() : ""}
                         onValueChange={(value) => field.onChange(Number(value))}
                         disabled={!watchedMake || watchedMake === 0}
                       >
@@ -433,14 +835,16 @@ export default function PlaceAddForm() {
                               Loading...
                             </SelectItem>
                           ) : (
-                            models?.map((model: any) => (
-                              <SelectItem
-                                key={model.id}
-                                value={model.id.toString()}
-                              >
-                                {model.name}
-                              </SelectItem>
-                            ))
+                            models
+                              ?.filter((model) => model.make.id === watchedMake)
+                              .map((model) => (
+                                <SelectItem
+                                  key={model.id}
+                                  value={model.id.toString()}
+                                >
+                                  {model.name}
+                                </SelectItem>
+                              )) ?? null
                           )}
                         </SelectContent>
                       </Select>
@@ -590,41 +994,81 @@ export default function PlaceAddForm() {
                     )}
                   </div>
                 </div>
-                {/* Fuel Type */}
-                <div className="space-y-2">
-                  <Label htmlFor="fuel" className="text-sm text-gray-500">
-                    Fuel Type
-                  </Label>
-                  <Controller
-                    name="fuelType"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                            errors.fuelType ? "border-red-500" : ""
-                          }`}
+                {/* Fuel Type & Body Type */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fuel" className="text-sm text-gray-500">
+                      Fuel Type
+                    </Label>
+                    <Controller
+                      name="fuelType"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
                         >
-                          <SelectValue placeholder="Select fuel type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {fuelTypes.map((fuel) => (
-                            <SelectItem key={fuel} value={fuel}>
-                              {fuel}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                          <SelectTrigger
+                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                              errors.fuelType ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select fuel type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {fuelTypes.map((fuel) => (
+                              <SelectItem key={fuel} value={fuel.toLowerCase()}>
+                                {fuel}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.fuelType && (
+                      <p className="text-red-500 text-sm">
+                        {errors.fuelType.message}
+                      </p>
                     )}
-                  />
-                  {errors.fuelType && (
-                    <p className="text-red-500 text-sm">
-                      {errors.fuelType.message}
-                    </p>
-                  )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="bodyType" className="text-sm text-gray-500">
+                      Body Type
+                    </Label>
+                    <Controller
+                      name="bodyType"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger
+                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                              errors.bodyType ? "border-red-500" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select body type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {bodyTypes.map((bodyType) => (
+                              <SelectItem
+                                key={bodyType.label}
+                                value={bodyType.value}
+                              >
+                                {bodyType.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {errors.bodyType && (
+                      <p className="text-red-500 text-sm">
+                        {errors.bodyType.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Colors */}
@@ -739,6 +1183,20 @@ export default function PlaceAddForm() {
                         </button>
                       </div>
                     ))}
+                    {c_id &&
+                      carData?.images?.map((img: any, idx: number) => (
+                        <div
+                          key={`existing-${idx}`}
+                          className="relative w-full h-32 rounded-lg overflow-hidden border"
+                        >
+                          <Image
+                            src={img.image_url}
+                            alt={img.caption || "Car Image"}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
                   </div>
                   {errors.images && (
                     <p className="text-red-500 text-sm">
@@ -954,10 +1412,14 @@ export default function PlaceAddForm() {
                   </Button>
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="px-8 py-3 bg-black hover:bg-gray-800 text-white rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded min-w-[95px]"
+                    disabled={isPostPending || isUpdatePending}
                   >
-                    {isSubmitting ? "Saving..." : "Submit"}
+                    {isPostPending || isUpdatePending ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <p>{c_id ? "Update" : "Submit"}</p>
+                    )}
                   </Button>
                 </div>
               </div>

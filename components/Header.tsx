@@ -5,8 +5,8 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useUserStore } from "@/store/user";
-import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface HeaderProps {
   color?: string;
@@ -22,6 +22,8 @@ export default function Header({ color }: HeaderProps) {
         ? "text-black hover:text-black/60"
         : "text-white hover:text-white/80"
     } p-2 px-4 rounded-md cursor-pointer ${isBtn ? "" : ""}`;
+
+  const { toast } = useToast();
 
   return (
     <header
@@ -60,6 +62,9 @@ export default function Header({ color }: HeaderProps) {
         <Link href={"/favorites"} className={linkClasses()}>
           Favourites
         </Link>
+        <Link href={"/mylistings"} className={linkClasses()}>
+          My Ads
+        </Link>
         <Link
           href={user.email ? "profile" : "/signin"}
           className={linkClasses()}
@@ -88,7 +93,10 @@ export default function Header({ color }: HeaderProps) {
           onClick={(e) => {
             if (!user.email) {
               e.preventDefault();
-              toast.error("Log in or create an account to sell your car.");
+              toast({
+                // title: "",
+                description: "❌   Log in or create an account to sell your car.",
+              });
             }
           }}
         >
@@ -172,9 +180,11 @@ export default function Header({ color }: HeaderProps) {
                 onClick={(e) => {
                   if (!user.email) {
                     e.preventDefault();
-                    toast.error(
-                      "Log in or create an account to sell your car."
-                    );
+                    toast({
+                      // title: "",
+                      description:
+                        "❌ Log in or create an account to sell your car.",
+                    });
                     return;
                   }
                   setIsOpen(false);

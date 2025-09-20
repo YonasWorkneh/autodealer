@@ -74,7 +74,7 @@ const AuctionListView = () => {
       {/* Header */}
       <Header color="black" />
 
-      <div className="space-y-4 px-6 md:px-40 py-10">
+      <div className="space-y-4 px-6 md:px-50 py-10">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
           Live Car Auctions
         </h2>
@@ -88,7 +88,7 @@ const AuctionListView = () => {
           {mockAuctions.map((auction) => (
             <Card
               key={auction.id}
-              className="bg-white border-gray-200 overflow-hidden shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+              className="shadow-none bg-white border-gray-200 overflow-hidden cursor-pointer hover:shadow-sm transition-shadow"
               onClick={() => router.push(`/auction/${auction.id}`)}
             >
               <div className="p-4 md:p-6">

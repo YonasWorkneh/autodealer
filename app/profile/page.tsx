@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,22 +10,40 @@ import Header from "@/components/Header";
 import { useUserStore } from "@/store/user";
 import { logout } from "@/lib/auth/logout";
 import { useRouter } from "next/navigation";
+import Loading from "../loading";
+import { useForm } from "react-hook-form";
+
+type ProfileFormValues = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  contact: string;
+};
 
 export default function UserProfile() {
   const { user, setUser } = useUserStore();
-  const [firstName, setFirstName] = useState<string>(user.first_name);
-  const [lastName, setLastName] = useState<string>(user.last_name);
-  const [email, setEmail] = useState<string>(user.email);
-  const [contact, setContact] = useState<string>(user.contact ?? "");
-
   const [loggingOut, setIsLoggingOut] = useState<boolean>(false);
   const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+    reset,
+  } = useForm<ProfileFormValues>({
+    defaultValues: {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      contact: user.contact ?? "",
+    },
+  });
 
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
       await logout();
-      await new Promise((res) => setTimeout(res, 2000)); // simulate delay
+      await new Promise((res) => setTimeout(res, 2000));
       setUser({ first_name: "", last_name: "", email: "", contact: "" });
       router.push("/");
     } catch (err) {
@@ -35,14 +53,29 @@ export default function UserProfile() {
     }
   };
 
+  const onSubmit = async (data: ProfileFormValues) => {
+    try {
+      // TODO: call API to save updates
+      console.log("Form submitted:", data);
+      setUser(data); // update local store
+    } catch (err) {
+      console.error("Save profile error", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!user.email) router.push("/signin");
+    else reset(user); // reset form if user changes
+  }, [user, reset, router]);
+
+  if (!user.email) return <Loading />;
+
   return (
     <>
       <Header color="black" />
-      <div className="bg-white overflow-hidden px-6 sm:px-10 lg:px-20 py-10">
-        {/* Header background */}
+      <div className="bg-white overflow-hidden px-6 sm:px-10 lg:px-50 py-10">
         <div className="relative h-48 bg-gradient-to-r from-zinc-200 via-zinc-900/20 to-gray-200 rounded-t-xl" />
 
-        {/* Profile section */}
         <div className="relative px-6 pb-6 -mt-10">
           {/* Avatar */}
           <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
@@ -57,17 +90,15 @@ export default function UserProfile() {
             </AvatarFallback>
           </Avatar>
 
-          {/* User info */}
-          <div className="mt-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
             <h1 className="text-2xl font-bold text-black mb-2">
               {[user.first_name, user.last_name].filter(Boolean).join(" ") ||
                 " "}
             </h1>
-            <p className="text-gray-600 mb-6">{email}</p>
+            <p className="text-gray-600 mb-6">{user.email}</p>
 
-            {/* Form */}
             <div className="space-y-6">
-              {/* Name fields */}
+              {/* Name */}
               <div>
                 <Label className="text-sm font-medium text-black mb-3 block">
                   Name
@@ -75,17 +106,15 @@ export default function UserProfile() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Input
                     id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
                     placeholder="First name"
                     className="bg-gray-50 border-gray-200 focus:border-black focus:ring-black py-6"
+                    {...register("first_name")}
                   />
                   <Input
                     id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last name"
                     className="bg-gray-50 border-gray-200 focus:border-black focus:ring-black py-6"
+                    {...register("last_name")}
                   />
                 </div>
               </div>
@@ -101,9 +130,8 @@ export default function UserProfile() {
                     <Input
                       id="email"
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
                       className="pl-10 bg-gray-50 border-gray-200 focus:border-black focus:ring-black py-6"
+                      {...register("email")}
                     />
                   </div>
                 </div>
@@ -117,10 +145,9 @@ export default function UserProfile() {
                     <Input
                       id="contact"
                       type="tel"
-                      value={contact}
-                      onChange={(e) => setContact(e.target.value)}
                       placeholder="+251 912 345 678"
                       className="pl-10 bg-gray-50 border-gray-200 focus:border-black focus:ring-black py-6"
+                      {...register("contact")}
                     />
                   </div>
                 </div>
@@ -131,7 +158,8 @@ export default function UserProfile() {
             <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
               <Button
                 variant="outline"
-                className="flex items-center gap-2 w-full sm:w-auto py-6"
+                type="button"
+                className="flex items-center gap-2 w-full sm:w-auto py-6 min-w-[100px]"
                 onClick={handleLogout}
               >
                 {loggingOut ? (
@@ -143,11 +171,20 @@ export default function UserProfile() {
                   </>
                 )}
               </Button>
-              <Button className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto py-6">
-                Save changes
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto py-6"
+              >
+                {isSubmitting ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  "Save changes"
+                )}
               </Button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </>
