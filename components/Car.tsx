@@ -15,7 +15,7 @@ export default function Car({
   car,
 }: {
   setDetailOpened: (status: boolean) => void;
-  car: any;
+  car: FetchedCar;
 }) {
   const { data: favorites } = useCarFavorites();
   const { toast } = useToast();
@@ -34,14 +34,34 @@ export default function Car({
     });
   const { mutate } = useUpdateFavorite(onSuccess, onError);
   const favorited = favorites?.findIndex((favorite) => favorite.car === car.id);
+
+  // Format price from string to currency
+  const formattedPrice = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(parseFloat(car.price));
+
+  // Calculate days on market
+  const daysOnMarket = car.created_at
+    ? Math.floor(
+        (new Date().getTime() - new Date(car.created_at).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
+    : 0;
+
+  // Get main image
+  const mainImage = car.images?.[0]?.image_url || "/placeholder.svg";
+
   return (
-    <Link key={car.id} href={"/listing/gibberish"} className="block relative">
+    <Link key={car.id} href={`/listing/${car.id}`} className="block relative">
       <Card className="shadow-none border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
         <CardContent className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Image */}
           <div className="relative">
             <img
-              src={car.image || "/placeholder.svg"}
+              src={mainImage}
               alt={`${car.year} ${car.make} ${car.model}`}
               className="w-full h-40 object-cover rounded-lg"
             />
@@ -55,12 +75,10 @@ export default function Car({
                 mutate(car.id);
               }}
             >
-              {
-                <Heart
-                  className="h-4 w-4"
-                  fill={favorited !== -1 ? "black" : "none"}
-                />
-              }
+              <Heart
+                className="h-4 w-4"
+                fill={favorited !== -1 ? "black" : "none"}
+              />
             </Button>
           </div>
 
@@ -69,25 +87,31 @@ export default function Car({
             <h3 className="text-lg sm:text-xl font-semibold text-black">
               {car.year} {car.make} {car.model}
             </h3>
-            <p className="text-gray-600 text-sm">{car.mileage}</p>
-            <p className="text-gray-600 text-sm">{car.location}</p>
-            {car.percentLess && (
-              <Badge
-                variant="secondary"
-                className="bg-green-100 text-green-800"
-              >
-                {car.percentLess}
-              </Badge>
-            )}
             <p className="text-gray-600 text-sm">
-              {car.daysOnMarket} days on market
+              {car.mileage?.toLocaleString()} miles
+            </p>
+            <p className="text-gray-600 text-sm capitalize">{car.fuel_type}</p>
+            <p className="text-gray-600 text-sm capitalize">{car.body_type}</p>
+            <Badge
+              variant="secondary"
+              className={`${
+                car.status === "available"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {car.status}
+            </Badge>
+            <p className="text-gray-600 text-sm">
+              {daysOnMarket} days on market
             </p>
           </div>
 
           {/* Price */}
           <div className="flex flex-col justify-between items-end text-right space-y-1">
-            <p className="text-xl sm:text-2xl font-bold">{car.price}</p>
-            <p className="text-sm text-gray-600">est. {car.monthlyEst}</p>
+            <p className="text-xl sm:text-2xl font-bold">{formattedPrice}</p>
+            <p className="text-sm text-gray-600 capitalize">{car.sale_type}</p>
+            {car.trim && <p className="text-sm text-gray-600">{car.trim}</p>}
           </div>
         </CardContent>
       </Card>

@@ -17,91 +17,13 @@ import Header from "@/components/Header";
 import { CarDetailModal } from "./CarDetailModal";
 import FilterSidebar from "@/components/Filter";
 import Car from "@/components/Car";
+import { useCars } from "@/hooks/cars";
 
 export default function CarMarketplace() {
   const [detailOpened, setDetailOpened] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-
-  const cars = [
-    {
-      id: 1,
-      year: 2024,
-      make: "Jeep",
-      model: "Grand Cherokee Limited",
-      mileage: "39,514 Miles",
-      location: "Live Oak, TX",
-      price: "$26,999",
-      monthlyEst: "$467/mo",
-      daysOnMarket: 104,
-      percentLess: "45% less than similar listings",
-      image: "/2024-black-jeep-grand-cherokee.png",
-    },
-    {
-      id: 2,
-      year: 2024,
-      make: "Kia",
-      model: "Forte LXS",
-      mileage: "33,770 Miles",
-      location: "Austin, TX",
-      price: "$16,724",
-      monthlyEst: "$289/mo",
-      daysOnMarket: 11,
-      percentLess: "20% less than similar listings",
-      image: "/2024-red-kia-forte-sedan.png",
-    },
-    {
-      id: 3,
-      year: 2025,
-      make: "Chevrolet",
-      model: "Colorado WT/LT",
-      mileage: "New",
-      location: "Austin, TX",
-      price: "$38,659",
-      monthlyEst: "$669/mo",
-      daysOnMarket: 189,
-      percentLess: null,
-      image: "/2025-white-chevy-colorado.png",
-    },
-    {
-      id: 4,
-      year: 2025,
-      make: "Chevrolet",
-      model: "Colorado WT/LT",
-      mileage: "New",
-      location: "Austin, TX",
-      price: "$38,659",
-      monthlyEst: "$669/mo",
-      daysOnMarket: 189,
-      percentLess: null,
-      image: "/2025-white-chevy-colorado.png",
-    },
-    {
-      id: 5,
-      year: 2025,
-      make: "Chevrolet",
-      model: "Colorado WT/LT",
-      mileage: "New",
-      location: "Austin, TX",
-      price: "$38,659",
-      monthlyEst: "$669/mo",
-      daysOnMarket: 189,
-      percentLess: null,
-      image: "/2025-white-chevy-colorado.png",
-    },
-    {
-      id: 6,
-      year: 2025,
-      make: "Chevrolet",
-      model: "Colorado WT/LT",
-      mileage: "New",
-      location: "Austin, TX",
-      price: "$38,659",
-      monthlyEst: "$669/mo",
-      daysOnMarket: 189,
-      percentLess: null,
-      image: "/2025-white-chevy-colorado.png",
-    },
-  ];
+  const [selectedCar, setSelectedCar] = useState<any>(null);
+  const { data: cars, isLoading } = useCars();
 
   return (
     <div className="min-h-screen bg-white">
@@ -164,15 +86,52 @@ export default function CarMarketplace() {
 
             {/* Results Count */}
             <div className="mb-6">
-              <h2 className="text-3xl font-bold text-black">90,853</h2>
+              <h2 className="text-3xl font-bold text-black">
+                {cars?.length || 0}
+              </h2>
               <p className="text-gray-600">vehicles found</p>
             </div>
 
             {/* Car Listings */}
             <div className="space-y-4">
-              {cars.map((car) => (
-                <Car setDetailOpened={setDetailOpened} car={car} key={car.id} />
-              ))}
+              {isLoading ? (
+                // Loading skeleton
+                Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="bg-gray-100 rounded-lg p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-gray-200 h-40 rounded-lg"></div>
+                        <div className="md:col-span-2 space-y-2">
+                          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="h-6 bg-gray-200 rounded w-1/2 ml-auto"></div>
+                          <div className="h-4 bg-gray-200 rounded w-1/3 ml-auto"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : cars && cars.length > 0 ? (
+                cars.map((car) => (
+                  <Car
+                    setDetailOpened={(status) => {
+                      setDetailOpened(status);
+                      if (status) {
+                        setSelectedCar(car);
+                      }
+                    }}
+                    car={car}
+                    key={car.id}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">No cars found</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -193,31 +152,14 @@ export default function CarMarketplace() {
         </div>
       )}
 
-      {detailOpened && (
+      {detailOpened && selectedCar && (
         <CarDetailModal
           isOpen={detailOpened}
-          car={{
-            id: "string",
-            year: 2022,
-            make: "Volkswagen",
-            model: "ID6",
-            trim: "SV",
-            price: 4_000_000,
-            monthlyPayment: 200_000,
-            image: "/id6-orange.png",
-            mileage: 0,
-            transmission: "Automatic",
-            drivetrain: "AWD",
-            mpg: "",
-            exteriorColor: "Orange",
-            interiorColor: "White",
-            fuelType: "",
-            bodyStyle: "SUV",
-            doors: 4,
-            vin: "KNMAT2MV0HP518223",
-            blueetooth: true,
+          car={selectedCar}
+          onClose={() => {
+            setDetailOpened(false);
+            setSelectedCar(null);
           }}
-          onClose={() => setDetailOpened(false)}
         />
       )}
     </div>

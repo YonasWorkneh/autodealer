@@ -56,8 +56,6 @@ const FavoriteCarCard = ({
   return (
     <Card
       className="overflow-hidden bg-white border border-gray-200 shadow-sm transition-shadow hover:shadow-md cursor-pointer !pt-0"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onClick={() => router.push(`/listing/${car.id}`)}
     >
       {/* Car Image */}
@@ -86,7 +84,7 @@ const FavoriteCarCard = ({
 
         <Button
           variant="outline"
-          className={`flex w-full items-center justify-center gap-2 border-gray-300 text-gray-700 hover:bg-red-500 hover:text-white transition-colors ${
+          className={`flex w-full items-center justify-center gap-2 border-gray-300 text-gray-700 hover:bg-red-500 hover:text-white transition-colors cursor-pointer ${
             isRemoving ? "opacity-50 cursor-not-allowed" : ""
           }`}
           onClick={(e) => {
@@ -95,6 +93,8 @@ const FavoriteCarCard = ({
               onRemove();
             }
           }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
           disabled={isRemoving}
         >
           {hovered ? <X className="w-4 h-4" /> : <Heart className="w-4 h-4" />}

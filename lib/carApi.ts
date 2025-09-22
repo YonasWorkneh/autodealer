@@ -29,9 +29,9 @@ const credentials = async () => {
   return { access, refresh };
 };
 
-export async function fetchCars(): Promise<Car[]> {
+export async function fetchCars(): Promise<FetchedCar[]> {
   const credential = await credentials();
-  return fetcher<Car[]>("/inventory/cars/", {
+  return fetcher<FetchedCar[]>("/inventory/cars/", {
     headers: {
       Authorization: `Bearer ${credential.access}`,
     },

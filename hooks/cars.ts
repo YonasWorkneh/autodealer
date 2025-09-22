@@ -11,12 +11,10 @@ import {
   carFavorites,
   removeCarFavorite,
 } from "@/lib/carApi";
-import type { Car } from "@/app/types/Car";
-import { useToast } from "./use-toast";
-// const { user } = useUserStore();
+import type { FetchedCar } from "@/app/types/Car";
 
 export function useCars() {
-  return useQuery({
+  return useQuery<FetchedCar[]>({
     queryKey: ["cars"],
     queryFn: fetchCars,
   });
