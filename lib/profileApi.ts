@@ -64,6 +64,7 @@ export const updateProfile = async (data: any) => {
       method: "PATCH",
       body: profile,
     });
+    if (!res.ok) throw new Error(`Error updating profile`);
     const updatedProfile = await res.json();
     return updatedProfile;
   } catch (err) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -21,11 +21,15 @@ import {
 
 import Image from "next/image";
 import Header from "@/components/Header";
+import { useParams } from "next/navigation";
 
 export default function CarListingPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showAllFeatures, setShowAllFeatures] = useState(false);
+  const searchParams = useParams();
+  const { id } = searchParams;
+  console.log(id);
 
   const carImages = [
     "/white-honda-civic-sedan-front.png",
@@ -58,6 +62,10 @@ export default function CarListingPage() {
   const message =
     "HONDA CIVIC . good car with amazing condition.just come and take it and drive enjoy your life. Lorem ipsum dolor sit amet consectetur adipisicing elit...";
   const [readIndex, setReadIndex] = useState<number>(140);
+
+  useEffect(() => {
+    
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">

@@ -7,5 +7,5 @@ export function cn(...inputs: ClassValue[]) {
 
 export const formatPrice = (price: number | string) =>
   Intl.NumberFormat("en-us", { style: "currency", currency: "ETB" }).format(
-    typeof price === "number" ? price : +price
+    typeof price === "number" ? price : parseFloat(price)
   );

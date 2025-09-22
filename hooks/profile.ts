@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProfile, upgradeProfile } from "@/lib/profileApi"; // adjust path
+import { getProfile, updateProfile, upgradeProfile } from "@/lib/profileApi"; // adjust path
 import { useToast } from "./use-toast";
 
 // Fetch user profile
@@ -26,6 +26,20 @@ export function useUpgradeProfile() {
         title: "✅ Success",
         description: "Your profile upgrade have been saved.",
       });
+    },
+  });
+}
+
+export function useUpdateProfile(onError: () => void, onSuccess: () => void) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateProfile,
+    onError: () => onError(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["profile"],
+      });
+      onSuccess();
     },
   });
 }

@@ -7,6 +7,9 @@ import {
   postCar,
   getMyAds,
   deleteCar,
+  makeCarFavorite,
+  carFavorites,
+  removeCarFavorite,
 } from "@/lib/carApi";
 import type { Car } from "@/app/types/Car";
 import { useToast } from "./use-toast";
@@ -21,7 +24,7 @@ export function useCars() {
 
 export function useCar(id: string) {
   return useQuery({
-    queryKey: ["cars", id],
+    queryKey: ["car", id],
     queryFn: () => fetchCarById(id),
     enabled: !!id, // only run if id exists
   });
@@ -98,5 +101,39 @@ export function useDeleteCar(onError?: () => void, onSuccess?: () => void) {
     },
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["my-ads", "cars"] }),
+  });
+}
+
+export function useUpdateCarViews() {
+  return useMutation({});
+}
+
+export function useUpdateFavorite(
+  onSuccess?: () => void,
+  onError?: () => void
+) {
+  return useMutation({
+    mutationFn: (id: number) => makeCarFavorite(id),
+    onSuccess: () => onSuccess?.(),
+    onError: () => onError?.(),
+    onSettled: () => console.log(" settled"),
+  });
+}
+export function useCarFavorites() {
+  return useQuery({ queryKey: ["car-favorites"], queryFn: carFavorites });
+}
+
+export function useRemoveFavorite(
+  onSuccess?: () => void,
+  onError?: () => void
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => removeCarFavorite(id),
+    onSuccess: () => {
+      onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["car-favorites"] });
+    },
+    onError: () => onError?.(),
   });
 }

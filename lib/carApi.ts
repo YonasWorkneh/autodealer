@@ -1,5 +1,6 @@
 "use server";
 import type { Car, FetchedCar } from "@/app/types/Car"; // move your interfaces to a types file for reusability
+import { Favorite } from "@/app/types/Favorite";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
 import { cookies } from "next/headers";
@@ -105,4 +106,68 @@ export async function deleteCar(id: number) {
 
   // Return something serializable (plain object)
   return { success: true, id };
+}
+
+export async function updateCarViews(id: number) {
+  const crednetial = await credentials();
+  const res = await fetch(`${BASE_URL}/inventory/car-views/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${crednetial.access}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ip_address: "192.168.1.1" }),
+  });
+  console.log(res);
+  const data = await res.json();
+  console.log(data);
+}
+
+export async function makeCarFavorite(id: number) {
+  const credential = await credentials();
+  try {
+    const res = await fetch(`${BASE_URL}/inventory/car-favorites/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ car: id }),
+    });
+    if (!res.ok) throw new Error(`Something went wrong`);
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function carFavorites() {
+  const credential = await credentials();
+  try {
+    const res = await fetch(`${BASE_URL}/inventory/car-favorites/`, {
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+      },
+    });
+    if (!res.ok) throw new Error("Error fetching favorite cars.");
+    const data: Favorite[] = await res.json();
+    return data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function removeCarFavorite(id: number) {
+  const credential = await credentials();
+  try {
+    const res = await fetch(`${BASE_URL}/inventory/car-favorites/${id}/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+      },
+    });
+    if (!res.ok) throw new Error("Error removing favorite car.");
+    return { success: true, id };
+  } catch (err) {
+    throw err;
+  }
 }

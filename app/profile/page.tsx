@@ -1,41 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Phone, LucideLogOut, Loader2 } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  LucideLogOut,
+  Loader2,
+  User,
+  Camera,
+  MapPin,
+} from "lucide-react";
 import Header from "@/components/Header";
-import { useUserStore } from "@/store/user";
 import { logout } from "@/lib/auth/logout";
 import { useRouter } from "next/navigation";
 import Loading from "../loading";
 import { useForm } from "react-hook-form";
+import { useProfile, useUpdateProfile } from "@/hooks/profile";
+import { useToast } from "@/hooks/use-toast";
 
 type ProfileFormValues = {
   first_name: string;
   last_name: string;
-  email: string;
+  address: string;
   contact: string;
+  image?: File | null;
 };
 
 export default function UserProfile() {
-  const { user, setUser } = useUserStore();
+  const { data: profile, isFetched, isLoading } = useProfile();
   const [loggingOut, setIsLoggingOut] = useState<boolean>(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
+  const { toast } = useToast();
 
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
     reset,
+    setValue,
   } = useForm<ProfileFormValues>({
     defaultValues: {
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      contact: user.contact ?? "",
+      first_name: profile?.first_name,
+      last_name: profile?.last_name,
+      address: profile?.address,
+      contact: profile?.contact,
     },
   });
 
@@ -44,7 +58,6 @@ export default function UserProfile() {
       setIsLoggingOut(true);
       await logout();
       await new Promise((res) => setTimeout(res, 2000));
-      setUser({ first_name: "", last_name: "", email: "", contact: "" });
       router.push("/");
     } catch (err) {
       console.error("Logout error", err);
@@ -53,22 +66,59 @@ export default function UserProfile() {
     }
   };
 
+  const onSuccess = () =>
+    toast({
+      title: "✅ Succesfull!",
+      description: "Your changes have been saved succesfully.",
+    });
+  const onError = () =>
+    toast({
+      title: "❌ Profile update failed !",
+      description: "Something went wrong trying to update your profile.",
+    });
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile(
+    onError,
+    onSuccess
+  );
+
   const onSubmit = async (data: ProfileFormValues) => {
     try {
-      // TODO: call API to save updates
-      console.log("Form submitted:", data);
-      setUser(data); // update local store
+      const profileForm = new FormData();
+      profileForm.append("first_name", data.first_name);
+      profileForm.append("last_name", data.last_name);
+      profileForm.append("contact", data.contact);
+      profileForm.append("address", data.address);
+      if (data.image) {
+        profileForm.append("image", data.image);
+      }
+      updateProfile({ profile: profileForm, id: profile?.id });
     } catch (err) {
       console.error("Save profile error", err);
     }
   };
 
   useEffect(() => {
-    if (!user.email) router.push("/signin");
-    else reset(user); // reset form if user changes
-  }, [user, reset, router]);
+    if (!profile?.id && isFetched) router.push("/signin");
+    reset({
+      first_name: profile?.first_name,
+      last_name: profile?.last_name,
+      address: profile?.address,
+    });
+  }, [profile, reset, router]);
 
-  if (!user.email) return <Loading />;
+  if (isLoading) return <Loading />;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setValue("image", file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <>
@@ -77,25 +127,49 @@ export default function UserProfile() {
         <div className="relative h-48 bg-gradient-to-r from-zinc-200 via-zinc-900/20 to-gray-200 rounded-t-xl" />
 
         <div className="relative px-6 pb-6 -mt-10">
-          {/* Avatar */}
-          <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
-            <AvatarImage
-              src="/professional-woman-with-braids.png"
-              alt="Profile"
+          {/* Avatar with camera icon */}
+          <div className="relative w-28 h-28">
+            <Avatar className="w-28 h-28">
+              <AvatarImage
+                src={preview || profile?.image_url}
+                alt="Profile"
+                className="object-cover"
+              />
+              <AvatarFallback className="text-xl font-semibold bg-gray-100 uppercase">
+                {profile?.first_name ? (
+                  `${profile.first_name[0]}${profile.last_name?.[0] ?? ""}`
+                ) : (
+                  <User />
+                )}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Hidden file input */}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
             />
-            <AvatarFallback className="text-xl font-semibold bg-gray-100 uppercase">
-              {user.first_name
-                ? `${user.first_name[0]}${user.last_name?.[0] ?? ""}`
-                : user.email[0]}
-            </AvatarFallback>
-          </Avatar>
+
+            {/* Camera icon overlay */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 p-1.5 bg-black rounded-full text-white shadow-md hover:bg-gray-800 cursor-pointer"
+            >
+              <Camera size={16} />
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
             <h1 className="text-2xl font-bold text-black mb-2">
-              {[user.first_name, user.last_name].filter(Boolean).join(" ") ||
-                " "}
+              {[profile?.first_name, profile?.last_name]
+                .filter(Boolean)
+                .join(" ") || " "}
             </h1>
-            <p className="text-gray-600 mb-6">{user.email}</p>
+            <p className="text-gray-600 mb-6">{profile?.address}</p>
 
             <div className="space-y-6">
               {/* Name */}
@@ -122,16 +196,19 @@ export default function UserProfile() {
               {/* Email + Contact */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-sm font-medium text-black mb-3 block">
-                    Email address
+                  <Label
+                    className="text-sm font-medium text-black mb-3 block"
+                    htmlFor="address"
+                  >
+                    Address
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input
-                      id="email"
-                      type="email"
+                      id="address"
+                      // placeholder=""
                       className="pl-10 bg-gray-50 border-gray-200 focus:border-black focus:ring-black py-6"
-                      {...register("email")}
+                      {...register("address")}
                     />
                   </div>
                 </div>
@@ -145,7 +222,7 @@ export default function UserProfile() {
                     <Input
                       id="contact"
                       type="tel"
-                      placeholder="+251 912 345 678"
+                      placeholder="phone no."
                       className="pl-10 bg-gray-50 border-gray-200 focus:border-black focus:ring-black py-6"
                       {...register("contact")}
                     />
@@ -174,10 +251,10 @@ export default function UserProfile() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto py-6"
+                disabled={isUpdating}
+                className="bg-black text-white hover:bg-gray-800 w-full sm:w-auto py-6 cursor-pointer min-w-[125px]"
               >
-                {isSubmitting ? (
+                {isUpdating ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
                   "Save changes"

@@ -1,78 +1,84 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/Header";
-import Image from "next/image";
-import { Heart, X } from "lucide-react";
+import { Heart, Link, CarFrontIcon } from "lucide-react";
+import { useCarFavorites, useRemoveFavorite } from "@/hooks/cars";
 
-interface Car {
-  id: number;
-  name: string;
-  year: number;
-  price: number;
-  image: string;
-  isFavorite?: boolean;
-}
+import { useToast } from "@/hooks/use-toast";
 
-const cars: Car[] = [
-  {
-    id: 1,
-    name: "Volkswagen-ID6",
-    year: 2016,
-    price: 99000,
-    image: "/id6-orange.png",
-    isFavorite: true,
-  },
-  {
-    id: 2,
-    name: "Invincible",
-    year: 2015,
-    price: 85000,
-    image: "/invincible.png",
-    isFavorite: false,
-  },
-  {
-    id: 3,
-    name: "Toyota V8",
-    year: 2020,
-    price: 85000,
-    image: "/v8.png",
-    isFavorite: true,
-  },
-  {
-    id: 4,
-    name: "Jetour T1",
-    year: 2016,
-    price: 123000,
-    image: "/jetour.png",
-    isFavorite: true,
-  },
-  {
-    id: 5,
-    name: "BYD-Song",
-    year: 2018,
-    price: 92000,
-    image: "/byd-song.png",
-    isFavorite: true,
-  },
-];
+import FavoriteCarCard from "@/components/FavouriteCarCard";
 
 export default function FavoritesPage() {
-  const [carList, setCarList] = useState(cars);
+  const { toast } = useToast();
+  const { data: favorites, isLoading: favoritesLoading } = useCarFavorites();
 
-  const toggleFavorite = (carId: number) => {
-    setCarList((prev) =>
-      prev.map((car) =>
-        car.id === carId ? { ...car, isFavorite: !car.isFavorite } : car
-      )
+  const onRemoveSuccess = () => {
+    toast({
+      title: "Removed from favorites",
+      description: "Car has been removed from your favorites.",
+    });
+  };
+
+  const onRemoveError = () => {
+    toast({
+      title: "Failed to remove",
+      description:
+        "Something went wrong while removing the car from favorites.",
+      variant: "destructive",
+    });
+  };
+
+  const { mutate: removeFavorite, isPending: isRemoving } = useRemoveFavorite(
+    onRemoveSuccess,
+    onRemoveError
+  );
+
+  // If no favorites, show empty state
+  if (favoritesLoading) {
+    return (
+      <>
+        <Header color="black" />
+        <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-50 py-8 bg-white min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your favorites...</p>
+          </div>
+        </div>
+      </>
     );
-  };
+  }
 
-  const removeCar = (carId: number) => {
-    setCarList((prev) => prev.filter((car) => car.id !== carId));
-  };
+  if (!favorites || favorites.length === 0) {
+    return (
+      <>
+        <Header color="black" />
+        <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-50 py-8 bg-white min-h-screen flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="mb-6">
+              <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                No favorites yet
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Start exploring cars and add them to your favorites to see them
+                here.
+              </p>
+            </div>
+            <Link
+              href={`/listing`}
+              className="text-sm font-medium text-white bg-zinc-800 hover:bg-zinc-900 cursor-pointer flex items-center gap-1 group p-4 py-2 rounded-sm"
+            >
+              <CarFrontIcon />
+              <span>Browse cars</span>
+              <span className="group-hover:translate-x-1 transition-all">
+                →
+              </span>
+            </Link>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -81,7 +87,7 @@ export default function FavoritesPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-semibold text-black">
-            Favorites ({carList.length})
+            Favorites ({favorites.length})
           </h1>
           <p className="text-gray-500 text-sm sm:text-base mt-2">
             These are the cars you have marked as favorites.
@@ -90,12 +96,12 @@ export default function FavoritesPage() {
 
         {/* Car Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {carList.map((car) => (
-            <CarCard
-              key={car.id}
-              car={car}
-              onToggleFavorite={() => toggleFavorite(car.id)}
-              onRemove={() => removeCar(car.id)}
+          {favorites.map((favorite) => (
+            <FavoriteCarCard
+              key={favorite.id}
+              favorite={favorite}
+              onRemove={() => removeFavorite(favorite.id)}
+              isRemoving={isRemoving}
             />
           ))}
         </div>
@@ -103,49 +109,3 @@ export default function FavoritesPage() {
     </>
   );
 }
-
-interface CarCardProps {
-  car: Car;
-  onToggleFavorite: () => void;
-  onRemove: () => void;
-}
-
-const CarCard = ({ car, onToggleFavorite, onRemove }: CarCardProps) => {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <Card
-      className="overflow-hidden bg-white border border-gray-200 shadow-sm transition-shadow hover:shadow-md"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Car Image */}
-      <div className="relative w-full h-56 sm:h-64 lg:h-48 bg-gray-100 overflow-hidden">
-        <Image
-          src={car.image || "/placeholder.svg"}
-          alt={`${car.name} ${car.year}`}
-          fill
-          className="object-cover"
-        />
-      </div>
-
-      {/* Card Content */}
-      <CardContent className="p-4">
-        <h3 className="text-lg sm:text-xl font-semibold text-black mb-2">
-          {car.name} {car.year}
-        </h3>
-
-        <p className="text-gray-700 font-bold text-lg mb-3">${car.price}</p>
-
-        <Button
-          variant="outline"
-          className={`flex w-full items-center justify-center gap-2 border-gray-300 text-gray-700 hover:bg-red-500 hover:text-white transition-colors`}
-          onClick={hovered ? onRemove : onToggleFavorite}
-        >
-          {hovered ? <X className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
-          {hovered ? "Remove" : "Favorite"}
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
