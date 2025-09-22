@@ -22,19 +22,48 @@ import {
 import Image from "next/image";
 import Header from "@/components/Header";
 import { useParams } from "next/navigation";
+import { useCar, useCarFavorites, useUpdateFavorite } from "@/hooks/cars";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { formatPrice } from "@/lib/utils";
 
 export default function CarListingPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showAllFeatures, setShowAllFeatures] = useState(false);
+  const [readIndex, setReadIndex] = useState<number>(140);
+
   const searchParams = useParams();
   const { id } = searchParams;
-  console.log(id);
 
-  const carImages = [
-    "/white-honda-civic-sedan-front.png",
-    "/white-honda-civic-sedan-side.png",
-    "/white-honda-civic-interior.png",
+  const { data: car, isLoading, error } = useCar(id as string);
+  const { data: favorites } = useCarFavorites();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["car-favorites"] });
+    toast({
+      title: "✅ Successfull",
+      description: "Car has been marked as your favorite.",
+    });
+  };
+
+  const onError = () =>
+    toast({
+      title: "❌ Something went wrong",
+      description: "Unable to make car your favorite.",
+    });
+
+  const { mutate: toggleFavorite } = useUpdateFavorite(onSuccess, onError);
+
+  const favorited = favorites?.findIndex(
+    (favorite) => favorite.car === car?.id
+  );
+
+  // Get car images from API data or fallback to placeholder
+  const carImages = car?.images?.map((img) => img.image_url) || [
+    "/placeholder.svg",
   ];
 
   const nextImage = () => {
@@ -47,25 +76,87 @@ export default function CarListingPage() {
     );
   };
 
-  const features = [
-    "All Wheel Steering",
-    "Anti-Lock Brakes/ABS",
-    "Cruise Control",
-    "Dual Exhaust",
-    "Front Airbags",
-    "Power Steering",
-    "Side Airbags",
-    "Tiptronic Gears",
-  ];
+  // Get features from car data
+  const getCarFeatures = () => {
+    if (!car) return [];
+    const features = [];
 
+    // Add features based on car data
+    if (car.all_wheel_steering) features.push("All Wheel Steering");
+    if (car.anti_lock_brakes) features.push("Anti-Lock Brakes/ABS");
+    if (car.cruise_control) features.push("Cruise Control");
+    if (car.dual_exhaust) features.push("Dual Exhaust");
+    if (car.front_airbags) features.push("Front Airbags");
+    if (car.power_steering) features.push("Power Steering");
+    if (car.side_airbags) features.push("Side Airbags");
+    if (car.tiptronic_gears) features.push("Tiptronic Gears");
+    if (car.bluetooth) features.push("Bluetooth");
+    if (car.leather_seats) features.push("Leather Seats");
+    if (car.navigation_system) features.push("Navigation System");
+    if (car.sunroof) features.push("Sunroof");
+    if (car.power_windows) features.push("Power Windows");
+    if (car.power_locks) features.push("Power Locks");
+    if (car.climate_control) features.push("Climate Control");
+    if (car.keyless_entry) features.push("Keyless Entry");
+
+    return features;
+  };
+
+  const features = getCarFeatures();
   const visibleFeatures = showAllFeatures ? features : features.slice(0, 8);
-  const message =
-    "HONDA CIVIC . good car with amazing condition.just come and take it and drive enjoy your life. Lorem ipsum dolor sit amet consectetur adipisicing elit...";
-  const [readIndex, setReadIndex] = useState<number>(140);
+  const message = car?.description || "No description available for this car.";
 
   useEffect(() => {
-    
-  }, []);
+    // Reset image index when car changes
+    setCurrentImageIndex(0);
+  }, [car?.id]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <Header color="black" />
+        <div className="px-0 sm:px-6 lg:px-50 py-6 md:py-10">
+          <div className="animate-pulse">
+            <div className="bg-gray-200 h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] rounded-lg mb-6"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                <div className="bg-gray-200 h-32 rounded-lg"></div>
+              </div>
+              <div className="bg-gray-200 h-64 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !car) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <Header color="black" />
+        <div className="px-0 sm:px-6 lg:px-50 py-6 md:py-10">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              Car Not Found
+            </h1>
+            <p className="text-gray-600 mb-6">
+              The car you're looking for doesn't exist or has been removed.
+            </p>
+            <Button
+              onClick={() => window.history.back()}
+              className="bg-black text-white hover:bg-gray-800"
+            >
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -76,7 +167,7 @@ export default function CarListingPage() {
           <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
             <Image
               src={carImages[currentImageIndex]}
-              alt="Honda Civic VTi"
+              alt={`${car.year} ${car.make} ${car.model}`}
               width={120}
               height={120}
               className="w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] object-cover cursor-pointer"
@@ -120,9 +211,14 @@ export default function CarListingPage() {
               variant="outline"
               size="sm"
               className="flex items-center gap-2 bg-transparent"
+              onClick={() => toggleFavorite(car.id)}
             >
-              <Heart className="w-4 h-4" />
-              Favorite
+              <Heart
+                className={`w-4 h-4 ${
+                  favorited !== -1 ? "fill-red-500 text-red-500" : ""
+                }`}
+              />
+              {favorited !== -1 ? "Favorited" : "Favorite"}
             </Button>
             <Button
               variant="outline"
@@ -141,28 +237,29 @@ export default function CarListingPage() {
             {/* Price and Title */}
             <div>
               <div className="text-2xl sm:text-3xl font-bold text-black mb-2">
-                AED 46,000
+                {formatPrice(car.price)}
               </div>
               <h1 className="text-xl sm:text-2xl font-semibold mb-4">
-                Honda Civic VTi
+                {car.year} {car.make} {car.model}{" "}
+                {car.trim ? `(${car.trim})` : ""}
               </h1>
 
               <div className="flex flex-wrap gap-4 text-xs sm:text-sm text-gray-600">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  <span>2019</span>
+                  <span>{car.year}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Gauge className="w-4 h-4" />
-                  <span>79,800 km</span>
+                  <span>{car.mileage?.toLocaleString()} miles</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <LifeBuoy className="w-4 h-4" />
-                  <span>Left Hand</span>
+                  <span className="capitalize">{car.condition}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Globe className="w-4 h-4" />
-                  <span>GCC Specs</span>
+                  <span className="capitalize">{car.fuel_type}</span>
                 </div>
               </div>
             </div>
@@ -175,20 +272,54 @@ export default function CarListingPage() {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div className="space-y-3 sm:border-r sm:pr-4">
-                    {/* left column */}
                     <div className="flex justify-between">
                       <span className="text-gray-600">Interior Color</span>
-                      <span className="font-medium">Beige</span>
+                      <span className="font-medium">
+                        {car.interior_color || "N/A"}
+                      </span>
                     </div>
-                    {/* ...rest unchanged */}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Exterior Color</span>
+                      <span className="font-medium">
+                        {car.exterior_color || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Body Type</span>
+                      <span className="font-medium capitalize">
+                        {car.body_type}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Drivetrain</span>
+                      <span className="font-medium capitalize">
+                        {car.drivetrain}
+                      </span>
+                    </div>
                   </div>
                   <div className="space-y-3">
-                    {/* right column */}
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Horsepower</span>
-                      <span className="font-medium">0 - 99 HP</span>
+                      <span className="text-gray-600">Engine</span>
+                      <span className="font-medium">{car.engine || "N/A"}</span>
                     </div>
-                    {/* ...rest unchanged */}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Fuel Type</span>
+                      <span className="font-medium capitalize">
+                        {car.fuel_type}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Sale Type</span>
+                      <span className="font-medium capitalize">
+                        {car.sale_type}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Status</span>
+                      <span className="font-medium capitalize">
+                        {car.status}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -198,7 +329,7 @@ export default function CarListingPage() {
             <Card>
               <CardContent className="p-4 sm:p-6">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4">
-                  HONDA CIVIC (WITH GOLDEN PACKAGE (FAMILY CAR)
+                  {car.year} {car.make} {car.model}
                 </h2>
                 <p className="text-gray-700 mb-4 text-sm sm:text-base">
                   {message.slice(0, readIndex)}{" "}
@@ -208,48 +339,63 @@ export default function CarListingPage() {
                     </span>
                   )}
                 </p>
-                <Button
-                  variant="link"
-                  className="text-black p-0 h-auto font-normal cursor-pointer"
-                  onClick={() =>
-                    setReadIndex(
-                      readIndex === message.length ? 140 : message.length
-                    )
-                  }
-                >
-                  {readIndex === message.length ? "Show less" : "Read more"}
-                </Button>
+                {message.length > 140 && (
+                  <Button
+                    variant="link"
+                    className="text-black p-0 h-auto font-normal cursor-pointer"
+                    onClick={() =>
+                      setReadIndex(
+                        readIndex === message.length ? 140 : message.length
+                      )
+                    }
+                  >
+                    {readIndex === message.length ? "Show less" : "Read more"}
+                  </Button>
+                )}
                 <div className="mt-4 text-xs sm:text-sm text-gray-500">
-                  Posted on: 19th July 2025
+                  Posted on: {new Date(car.created_at).toLocaleDateString()}
                 </div>
               </CardContent>
             </Card>
 
             {/* Features */}
-            <Card>
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg sm:text-xl font-semibold">Features</h2>
-                </div>
-
-                <div className="mb-4">
-                  <h3 className="font-medium mb-3 text-sm sm:text-base">
-                    Drivers Assistance & Safety
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {visibleFeatures.map((feature, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2 text-sm"
+            {features.length > 0 && (
+              <Card>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg sm:text-xl font-semibold">
+                      Features
+                    </h2>
+                    {features.length > 8 && (
+                      <Button
+                        variant="link"
+                        className="text-black p-0 h-auto font-normal cursor-pointer"
+                        onClick={() => setShowAllFeatures(!showAllFeatures)}
                       >
-                        <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                        {showAllFeatures ? "Show less" : "Show all"}
+                      </Button>
+                    )}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+
+                  <div className="mb-4">
+                    <h3 className="font-medium mb-3 text-sm sm:text-base">
+                      Available Features
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {visibleFeatures.map((feature, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -351,9 +497,16 @@ export default function CarListingPage() {
             </button>
 
             <div className="absolute top-4 right-4 sm:right-20 z-10 flex gap-2 sm:gap-4">
-              <button className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-white bg-[#111] hover:bg-[#222] rounded-lg transition-colors cursor-pointer text-xs sm:text-sm">
-                <Heart className="w-4 h-4" />
-                Favorite
+              <button
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-white bg-[#111] hover:bg-[#222] rounded-lg transition-colors cursor-pointer text-xs sm:text-sm"
+                onClick={() => toggleFavorite(car.id)}
+              >
+                <Heart
+                  className={`w-4 h-4 ${
+                    favorited !== -1 ? "fill-red-500 text-red-500" : ""
+                  }`}
+                />
+                {favorited !== -1 ? "Favorited" : "Favorite"}
               </button>
               <button className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-white bg-[#111] hover:bg-[#222] rounded-lg transition-colors cursor-pointer text-xs sm:text-sm">
                 <Share2 className="w-4 h-4" />
@@ -364,7 +517,7 @@ export default function CarListingPage() {
             {/* Main image */}
             <Image
               src={carImages[currentImageIndex] || "/placeholder.svg"}
-              alt="Honda Civic VTi"
+              alt={`${car.year} ${car.make} ${car.model}`}
               width={120}
               height={120}
               className="w-full max-w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl h-auto object-contain"

@@ -97,7 +97,7 @@ export function CarDetailModal({ car, isOpen, onClose }: CarListingModalProps) {
               <Heart
                 className={`size-6 ${
                   favorited !== -1
-                    ? "text-red-500 fill-red-500"
+                    ? "text-zinc-800 fill-zinc-800"
                     : "text-black hover:text-zinc-900"
                 }`}
               />
