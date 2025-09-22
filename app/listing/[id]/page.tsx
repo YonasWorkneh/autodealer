@@ -17,8 +17,10 @@ import {
   Calendar,
   Star,
   Send,
+  Instagram,
+  Facebook,
+  MoreVertical,
 } from "lucide-react";
-
 import Image from "next/image";
 import Header from "@/components/Header";
 import { useParams } from "next/navigation";
@@ -26,12 +28,19 @@ import { useCar, useCarFavorites, useUpdateFavorite } from "@/hooks/cars";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { formatPrice } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 
 export default function CarListingPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showAllFeatures, setShowAllFeatures] = useState(false);
   const [readIndex, setReadIndex] = useState<number>(140);
+  const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
 
   const searchParams = useParams();
   const { id } = searchParams;
@@ -81,7 +90,6 @@ export default function CarListingPage() {
     if (!car) return [];
     const features = [];
 
-    // Add features based on car data
     if (car.all_wheel_steering) features.push("All Wheel Steering");
     if (car.anti_lock_brakes) features.push("Anti-Lock Brakes/ABS");
     if (car.cruise_control) features.push("Cruise Control");
@@ -105,6 +113,74 @@ export default function CarListingPage() {
   const features = getCarFeatures();
   const visibleFeatures = showAllFeatures ? features : features.slice(0, 8);
   const message = car?.description || "No description available for this car.";
+
+  // Share functionality
+  const shareData = {
+    title: `${car?.year} ${car?.make} ${car?.model} ${
+      car?.trim ? `(${car.trim})` : ""
+    }`,
+    text: `${message.slice(0, 100)}... Price: ${formatPrice(car?.price || "")}`,
+    url: window.location.href,
+    image: carImages[currentImageIndex],
+  };
+
+  const shareLinks = [
+    {
+      name: "Telegram",
+      icon: <Send className="w-4 h-4" />,
+      url: `https://t.me/share/url?url=${encodeURIComponent(
+        shareData.url
+      )}&text=${encodeURIComponent(
+        `${shareData.title}\n${shareData.text}\nImage: ${shareData.image}`
+      )}`,
+    },
+    {
+      name: "Facebook",
+      icon: <Facebook className="w-4 h-4" />,
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        shareData.url
+      )}&quote=${encodeURIComponent(`${shareData.title}\n${shareData.text}`)}`,
+    },
+    {
+      name: "Instagram",
+      icon: <Instagram className="w-4 h-4" />,
+      url: `https://www.instagram.com/`, // Instagram requires manual posting
+    },
+    {
+      name: "WhatsApp",
+      icon: <MessageCircle className="w-4 h-4" />,
+      url: `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        `${shareData.title}\n${shareData.text}\n${shareData.url}\nImage: ${shareData.image}`
+      )}`,
+    },
+    {
+      name: "X",
+      icon: (
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      ),
+      url: `https://x.com/intent/tweet?text=${encodeURIComponent(
+        `${shareData.title}\n${shareData.text}`
+      )}&url=${encodeURIComponent(shareData.url)}`,
+    },
+  ];
+
+  const handleShare = (url: string, name: string) => {
+    if (name === "Instagram") {
+      toast({
+        title: "Instagram Sharing",
+        description:
+          "Link, title, description, and image URL copied to clipboard. Paste them manually in Instagram.",
+      });
+      navigator.clipboard.writeText(
+        `${shareData.title}\n${shareData.text}\n${shareData.url}\nImage: ${shareData.image}`
+      );
+    } else {
+      window.open(url, "_blank");
+    }
+    setIsShareDropdownOpen(false);
+  };
 
   useEffect(() => {
     // Reset image index when car changes
@@ -210,24 +286,69 @@ export default function CarListingPage() {
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2 bg-transparent"
+              className="flex items-center gap-2 bg-transparent cursor-pointer"
               onClick={() => toggleFavorite(car.id)}
             >
               <Heart
                 className={`w-4 h-4 ${
-                  favorited !== -1 ? "fill-red-500 text-red-500" : ""
+                  favorited !== -1 ? "fill-zinc-800 text-zinc-800" : ""
                 }`}
               />
               {favorited !== -1 ? "Favorited" : "Favorite"}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 bg-transparent"
-            >
-              <Share2 className="w-4 h-4" />
-              Share
-            </Button>
+            <div className="relative">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 bg-transparent cursor-pointer"
+                    onClick={() => setIsShareDropdownOpen(!isShareDropdownOpen)}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Share
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="mt-2 w-48 bg-white shadow-lg rounded-lg"
+                >
+                  {shareLinks.map((link) => (
+                    <DropdownMenuItem
+                      key={link.name}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left cursor-pointer"
+                      onClick={() => handleShare(link.url, link.name)}
+                    >
+                      {link.icon}
+                      {link.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 bg-transparent cursor-pointer"
+                onClick={() => setIsShareDropdownOpen(!isShareDropdownOpen)}
+              >
+                <Share2 className="w-4 h-4" />
+                Share
+              </Button>
+              {isShareDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-10">
+                  {shareLinks.map((link) => (
+                    <button
+                      key={link.name}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left cursor-pointer"
+                      onClick={() => handleShare(link.url, link.name)}
+                    >
+                      {link.icon}
+                      {link.name}
+                    </button>
+                  ))}
+                </div>
+              )} */}
+            </div>
           </div>
         </div>
 
@@ -333,10 +454,12 @@ export default function CarListingPage() {
                 </h2>
                 <p className="text-gray-700 mb-4 text-sm sm:text-base">
                   {message.slice(0, readIndex)}{" "}
-                  {message.length > 140 && (
+                  {message.length > 140 && readIndex !== message.length ? (
                     <span className="text-gray-700 mb-4 cursor-pointer">
                       ...
                     </span>
+                  ) : (
+                    <></>
                   )}
                 </p>
                 {message.length > 140 && (
@@ -378,9 +501,6 @@ export default function CarListingPage() {
                   </div>
 
                   <div className="mb-4">
-                    <h3 className="font-medium mb-3 text-sm sm:text-base">
-                      Available Features
-                    </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {visibleFeatures.map((feature, index) => (
                         <div
@@ -503,15 +623,34 @@ export default function CarListingPage() {
               >
                 <Heart
                   className={`w-4 h-4 ${
-                    favorited !== -1 ? "fill-red-500 text-red-500" : ""
+                    favorited !== -1 ? "fill-zinc-800 text-zinc-800" : ""
                   }`}
                 />
                 {favorited !== -1 ? "Favorited" : "Favorite"}
               </button>
-              <button className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-white bg-[#111] hover:bg-[#222] rounded-lg transition-colors cursor-pointer text-xs sm:text-sm">
-                <Share2 className="w-4 h-4" />
-                Share
-              </button>
+              <div className="relative">
+                <button
+                  className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-white bg-[#111] hover:bg-[#222] rounded-lg transition-colors cursor-pointer text-xs sm:text-sm"
+                  onClick={() => setIsShareDropdownOpen(!isShareDropdownOpen)}
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </button>
+                {isShareDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-10">
+                    {shareLinks.map((link) => (
+                      <button
+                        key={link.name}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        onClick={() => handleShare(link.url, link.name)}
+                      >
+                        {link.icon}
+                        {link.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Main image */}

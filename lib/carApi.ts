@@ -1,11 +1,10 @@
-"use server";
 import type { Car, FetchedCar } from "@/app/types/Car"; // move your interfaces to a types file for reusability
 import { Favorite } from "@/app/types/Favorite";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
-import { cookies } from "next/headers";
+import { getCredentials } from "./credential";
 
-const BASE_URL = process.env.BASE_API_URL as string;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -14,7 +13,6 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
       ...(options?.headers || {}),
     },
   });
-  console.log(res);
 
   if (!res.ok) {
     throw new Error(`API error: ${res.status} ${res.statusText}`);
@@ -22,15 +20,9 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
   return res.json() as Promise<T>;
 }
-const credentials = async () => {
-  const cookieStore = await cookies();
-  const access = cookieStore.get("access")?.value;
-  const refresh = cookieStore.get("refresh")?.value;
-  return { access, refresh };
-};
 
 export async function fetchCars(): Promise<FetchedCar[]> {
-  const credential = await credentials();
+  const credential = await getCredentials();
   return fetcher<FetchedCar[]>("/inventory/cars/", {
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -39,7 +31,7 @@ export async function fetchCars(): Promise<FetchedCar[]> {
 }
 
 export async function fetchCarById(id: string): Promise<FetchedCar> {
-  const credential = await credentials();
+  const credential = await getCredentials();
   return fetcher<FetchedCar>(`/inventory/cars/${id}`, {
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -48,7 +40,7 @@ export async function fetchCarById(id: string): Promise<FetchedCar> {
 }
 
 export async function fetchMakes(): Promise<Make[]> {
-  const credential = await credentials();
+  const credential = await getCredentials();
   return fetcher<Make[]>("/inventory/makes/", {
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -57,7 +49,7 @@ export async function fetchMakes(): Promise<Make[]> {
 }
 
 export async function fetchModels(makeId?: number): Promise<Model[]> {
-  const credential = await credentials();
+  const credential = await getCredentials();
   const url = makeId
     ? `/inventory/models/?make=${makeId}`
     : "/inventory/models/";
@@ -69,7 +61,7 @@ export async function fetchModels(makeId?: number): Promise<Model[]> {
 }
 
 export async function postCar(formData: FormData): Promise<Car> {
-  const credential = await credentials();
+  const credential = await getCredentials();
 
   return fetcher<Car>("/inventory/cars/", {
     method: "POST",
@@ -82,7 +74,7 @@ export async function postCar(formData: FormData): Promise<Car> {
 
 export async function getMyAds(id: number | undefined) {
   if (!id) return [];
-  const credential = await credentials();
+  const credential = await getCredentials();
   const myAds = await fetcher<FetchedCar[]>("/inventory/cars/", {
     headers: {
       Authorization: `Bearer ${credential.access}`,
@@ -92,7 +84,7 @@ export async function getMyAds(id: number | undefined) {
 }
 
 export async function deleteCar(id: number) {
-  const credential = await credentials();
+  const credential = await getCredentials();
   const res = await fetch(`${BASE_URL}/inventory/cars/${id}/`, {
     method: "DELETE",
     headers: {
@@ -109,7 +101,7 @@ export async function deleteCar(id: number) {
 }
 
 export async function updateCarViews(id: number) {
-  const crednetial = await credentials();
+  const crednetial = await getCredentials();
   const res = await fetch(`${BASE_URL}/inventory/car-views/`, {
     method: "POST",
     headers: {
@@ -124,7 +116,7 @@ export async function updateCarViews(id: number) {
 }
 
 export async function makeCarFavorite(id: number) {
-  const credential = await credentials();
+  const credential = await getCredentials();
   try {
     const res = await fetch(`${BASE_URL}/inventory/car-favorites/`, {
       method: "POST",
@@ -141,7 +133,7 @@ export async function makeCarFavorite(id: number) {
 }
 
 export async function carFavorites() {
-  const credential = await credentials();
+  const credential = await getCredentials();
   try {
     const res = await fetch(`${BASE_URL}/inventory/car-favorites/`, {
       headers: {
@@ -157,7 +149,7 @@ export async function carFavorites() {
 }
 
 export async function removeCarFavorite(id: number) {
-  const credential = await credentials();
+  const credential = await getCredentials();
   try {
     const res = await fetch(`${BASE_URL}/inventory/car-favorites/${id}/`, {
       method: "DELETE",

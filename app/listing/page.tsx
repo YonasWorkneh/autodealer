@@ -24,6 +24,7 @@ export default function CarMarketplace() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<any>(null);
   const { data: cars, isLoading } = useCars();
+  console.log(cars);
 
   return (
     <div className="min-h-screen bg-white">

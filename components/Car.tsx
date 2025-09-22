@@ -9,6 +9,7 @@ import { Heart } from "lucide-react";
 import { useCarFavorites, useUpdateFavorite } from "@/hooks/cars";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { formatPrice } from "@/lib/utils";
 
 export default function Car({
   setDetailOpened,
@@ -36,12 +37,7 @@ export default function Car({
   const favorited = favorites?.findIndex((favorite) => favorite.car === car.id);
 
   // Format price from string to currency
-  const formattedPrice = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(parseFloat(car.price));
+  const formattedPrice = formatPrice(car.price);
 
   // Calculate days on market
   const daysOnMarket = car.created_at

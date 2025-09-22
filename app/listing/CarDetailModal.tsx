@@ -10,6 +10,7 @@ import { FetchedCar } from "@/app/types/Car";
 import { useCarFavorites, useUpdateFavorite } from "@/hooks/cars";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { formatPrice } from "@/lib/utils";
 
 interface CarListingModalProps {
   car: FetchedCar | null;
@@ -41,15 +42,6 @@ export function CarDetailModal({ car, isOpen, onClose }: CarListingModalProps) {
   if (!car) return null;
 
   const favorited = favorites?.findIndex((favorite) => favorite.car === car.id);
-
-  const formatPrice = (price: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(parseFloat(price));
-  };
 
   const formatMileage = (mileage: number) => {
     return new Intl.NumberFormat("en-US").format(mileage);

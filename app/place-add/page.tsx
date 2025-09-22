@@ -67,6 +67,7 @@ export default function PlaceAddForm() {
   const { data: profile } = useProfile();
   const [step, setStep] = useState(1);
   const [images, setImages] = useState<File[]>([]);
+  const [featuredImageIndex, setFeaturedImageIndex] = useState<number>(0);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const {
@@ -103,8 +104,6 @@ export default function PlaceAddForm() {
   const { data: models, isLoading: isModelsLoading } = useModels(watchedMake);
   const { data: carData, isLoading: isCarLoading } = useCar(c_id ? c_id : "");
 
-  console.log("carData", carData);
-
   const onSuccess = () => {
     reset({
       make: 0,
@@ -123,6 +122,7 @@ export default function PlaceAddForm() {
       bodyType: "",
     });
     setImages([]);
+    setFeaturedImageIndex(0);
     setTechnicalFeatures((prev) =>
       prev.map((tec) => ({ ...tec, checked: false }))
     );
@@ -150,6 +150,7 @@ export default function PlaceAddForm() {
       bodyType: "",
     });
     setImages([]);
+    setFeaturedImageIndex(0);
     setTechnicalFeatures((prev) =>
       prev.map((tec) => ({ ...tec, checked: false }))
     );
@@ -505,7 +506,6 @@ export default function PlaceAddForm() {
   // Pre-fill form with car data when c_id is present
   useEffect(() => {
     if (carData && c_id) {
-      console.log("Setting form with carData:", carData);
       setTimeout(() => {
         reset({
           make: carData.make_ref,
@@ -549,6 +549,10 @@ export default function PlaceAddForm() {
       const newImages = [...images, ...Array.from(e.target.files)];
       setImages(newImages);
       setValue("images", newImages);
+      // If this is the first image, make it featured by default
+      if (images.length === 0) {
+        setFeaturedImageIndex(0);
+      }
     }
   };
 
@@ -556,6 +560,19 @@ export default function PlaceAddForm() {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
     setValue("images", newImages);
+
+    // Adjust featured image index if needed
+    if (index === featuredImageIndex) {
+      // If we're removing the featured image, set the first remaining image as featured
+      setFeaturedImageIndex(newImages.length > 0 ? 0 : 0);
+    } else if (index < featuredImageIndex) {
+      // If we're removing an image before the featured one, adjust the index
+      setFeaturedImageIndex(featuredImageIndex - 1);
+    }
+  };
+
+  const setFeaturedImage = (index: number) => {
+    setFeaturedImageIndex(index);
   };
 
   const handleNext = async () => {
@@ -616,6 +633,7 @@ export default function PlaceAddForm() {
       carForm.append("model_ref", data.model.toString());
       carForm.append("year", data.year);
       carForm.append("mileage", data.mileage);
+      carForm.append("condition", parseInt(data.mileage) > 0 ? "used" : "new");
       carForm.append("engine", data.engine);
       carForm.append("gearbox", data.gearbox);
       carForm.append("exterior_color", data.bodyColor);
@@ -632,9 +650,10 @@ export default function PlaceAddForm() {
       // Add images to FormData
       data.images.forEach((image, index) => {
         carForm.append(`uploaded_images[${index}].image_file`, image);
+        console.log(image.name, index === featuredImageIndex);
         carForm.append(
           `uploaded_images[${index}].is_featured`,
-          String(index === 0 ? "True" : "False")
+          String(index === featuredImageIndex ? "True" : "False")
         );
         // caption = file name
         carForm.append(`uploaded_images[${index}].caption`, image.name);
@@ -675,8 +694,8 @@ export default function PlaceAddForm() {
         } else {
           // Create new car
           postCar(carForm);
-          console.log("CAr Form");
-          console.log(Object.fromEntries(carForm));
+          // console.log("CAr Form");
+          // console.log(Object.fromEntries(carForm));
         }
       }
     } catch (error) {
@@ -1151,6 +1170,10 @@ export default function PlaceAddForm() {
                   <Label htmlFor="upload" className="text-sm text-gray-500">
                     Uploads
                   </Label>
+                  <p className="text-xs text-gray-400">
+                    Upload car images. Click the checkbox to mark the main image
+                    for your listing.
+                  </p>
                   <div className="grid grid-cols-3 gap-4">
                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400">
                       <Plus className="w-6 h-6 text-gray-500" />
@@ -1174,6 +1197,14 @@ export default function PlaceAddForm() {
                           fill
                           className="object-cover"
                         />
+                        {/* Featured Badge */}
+                        {idx === featuredImageIndex && (
+                          <Checkbox
+                            className="absolute top-1 left-1"
+                            checked={true}
+                          />
+                        )}
+                        {/* Remove Button */}
                         <button
                           type="button"
                           onClick={() => removeImage(idx)}
@@ -1181,6 +1212,14 @@ export default function PlaceAddForm() {
                         >
                           ✕
                         </button>
+                        {/* Set as Featured Button */}
+                        {idx !== featuredImageIndex && (
+                          <Checkbox
+                            className="absolute top-1 left-1"
+                            checked={false}
+                            onCheckedChange={() => setFeaturedImage(idx)}
+                          />
+                        )}
                       </div>
                     ))}
                     {c_id &&
