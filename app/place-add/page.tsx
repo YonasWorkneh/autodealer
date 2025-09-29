@@ -693,6 +693,7 @@ export default function PlaceAddForm() {
           updateCar(carForm);
         } else {
           // Create new car
+          console.log(Object.fromEntries(carForm));
           postCar(carForm);
           // console.log("CAr Form");
           // console.log(Object.fromEntries(carForm));

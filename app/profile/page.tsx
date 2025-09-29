@@ -21,6 +21,7 @@ import Loading from "../loading";
 import { useForm } from "react-hook-form";
 import { useProfile, useUpdateProfile } from "@/hooks/profile";
 import { useToast } from "@/hooks/use-toast";
+import { useUserStore } from "@/store/user";
 
 type ProfileFormValues = {
   first_name: string;
@@ -32,6 +33,7 @@ type ProfileFormValues = {
 
 export default function UserProfile() {
   const { data: profile, isFetched, isLoading } = useProfile();
+  const { setUser } = useUserStore();
   const [loggingOut, setIsLoggingOut] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -63,6 +65,7 @@ export default function UserProfile() {
       console.error("Logout error", err);
     } finally {
       setIsLoggingOut(false);
+      setUser({ email: "", last_name: "", first_name: "" });
     }
   };
 

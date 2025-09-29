@@ -10,6 +10,7 @@ import {
   makeCarFavorite,
   carFavorites,
   removeCarFavorite,
+  getPopularCars,
 } from "@/lib/carApi";
 import type { FetchedCar } from "@/app/types/Car";
 
@@ -133,5 +134,12 @@ export function useRemoveFavorite(
       queryClient.invalidateQueries({ queryKey: ["car-favorites"] });
     },
     onError: () => onError?.(),
+  });
+}
+
+export function usePopularCars() {
+  return useQuery({
+    queryKey: ["popular-cars"],
+    queryFn: getPopularCars,
   });
 }

@@ -34,6 +34,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { updateCarViews } from "@/lib/carApi";
 
 export default function CarListingPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -49,6 +50,7 @@ export default function CarListingPage() {
   const { data: favorites } = useCarFavorites();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [ip, setIp] = useState<string | null>(null);
 
   const onSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ["car-favorites"] });
@@ -187,6 +189,23 @@ export default function CarListingPage() {
     setCurrentImageIndex(0);
   }, [car?.id]);
 
+  useEffect(() => {
+    async function fetchIp() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        setIp(data.ip);
+        await updateCarViews(
+          Array.isArray(id) ? parseInt(id[0]) : parseInt(id || ""),
+          data.ip
+        );
+      } catch (err) {
+        console.error("Failed to fetch IP", err);
+      }
+    }
+    fetchIp();
+  }, []);
+
   // Loading state
   if (isLoading) {
     return (
@@ -259,7 +278,7 @@ export default function CarListingPage() {
                 alt="img-count"
                 className="size-3 sm:size-4"
               />
-              {carImages.length}
+              {currentImageIndex + 1} / {carImages.length}
             </div>
 
             {/* Navigation arrows for main image */}

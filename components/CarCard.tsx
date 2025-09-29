@@ -1,10 +1,15 @@
 "use client";
 
 import { CardContent } from "@/components/ui/card";
-import { Gauge, Settings } from "lucide-react";
+import { Gauge, Heart, Settings } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Image from "next/image";
+import { Button } from "./ui/button";
+import { useCarFavorites, useUpdateCar, useUpdateFavorite } from "@/hooks/cars";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   title: string;
@@ -13,9 +18,10 @@ type Props = {
   transmission: string;
   price: number;
   image: string;
-  colors: string[];
+  color: string;
   selectedColor?: number;
   href: string;
+  id: number;
 };
 
 export default function CarCard({
@@ -25,17 +31,36 @@ export default function CarCard({
   transmission,
   price,
   image,
-  colors,
+  color,
   selectedColor = 0,
   href,
+  id,
 }: Props) {
-  const [activeColor, setActiveColor] = useState(selectedColor);
+  const { data: favorites } = useCarFavorites();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["car-favorites"] });
+    toast({
+      title: "✅ Successfull",
+      description: "Car has been marked as your favorite.",
+    });
+  };
+
+  const onError = () =>
+    toast({
+      title: "❌ Something went wrong",
+      description: "Unable to make car your favorite.",
+    });
+  const { mutate: makeFavorite } = useUpdateFavorite(onSuccess, onError);
+  const isFavorite = favorites?.findIndex((favorite) => favorite.car === id);
 
   const formatNumber = (n: number) =>
     new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
 
   return (
-    <Link href={href} className="flex h-full flex-col">
+    <Link href={href} className="flex h-full flex-col cursor-pointer">
       <div className="relative h-[190px] w-full">
         {/* Watermark model name */}
         <div className="absolute inset-0 flex items-start justify-center pt-6">
@@ -48,7 +73,7 @@ export default function CarCard({
           <img
             src={image || "/placeholder.svg"}
             alt={`${title} side view`}
-            className="h-[150px] w-auto object-contain"
+            className="w-full object-cover"
           />
         </div>
       </div>
@@ -69,30 +94,37 @@ export default function CarCard({
             <Settings className="h-4 w-4" aria-hidden="true" />
             <span>{transmission}</span>
           </div>
+          <div className="flex items-center gap-3">
+            <Image
+              src={"/seat.svg"}
+              alt={"seat svg"}
+              width={100}
+              height={100}
+              className="size-6"
+            />
+            <span className="capitalize text-sm">{color}</span>
+          </div>
         </div>
 
         {/* Colors + Price */}
         <div className="mt-1 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {colors.map((c, i) => (
-              <button
-                key={`${c}-${i}`}
-                type="button"
-                aria-label={`Select color ${i + 1}`}
-                onClick={() => setActiveColor(i)}
-                className={cn(
-                  "size-4 rounded-full ring-offset-2 transition",
-                  activeColor === i
-                    ? "ring-2 ring-neutral-400"
-                    : "ring-0 opacity-90 hover:opacity-100"
-                )}
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
+          <button
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              makeFavorite(id);
+            }}
+          >
+            <Heart
+              className={`${
+                isFavorite === -1 ? "" : "fill-zinc-900"
+              } cursor-pointer`}
+            />
+          </button>
 
           <div className="text-sm">
-            <span className="text-neutral-500">from</span>{" "}
+            <span className="text-neutral-500">From</span>{" "}
             <span className="font-semibold text-neutral-900">
               {"ETB " + formatNumber(price)}
             </span>

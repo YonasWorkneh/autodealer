@@ -64,7 +64,7 @@ export default function Car({
             <Button
               variant="ghost"
               size="sm"
-              className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+              className="absolute top-2 right-2 bg-white/80 hover:bg-white cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();

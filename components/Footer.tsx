@@ -29,22 +29,22 @@ export default function Footer() {
           <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
           <ul className="space-y-2 text-gray-400 text-sm">
             <li>
-              <Link href="/inventory" className="hover:text-white">
+              <Link href="/" className="hover:text-white">
                 Home
               </Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-white">
+              <Link href="/listing" className="hover:text-white">
                 Search
               </Link>
             </li>
             <li>
-              <Link href="/services" className="hover:text-white">
+              <Link href="/favorites" className="hover:text-white">
                 Favourites
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="hover:text-white">
+              <Link href="/place-add" className="hover:text-white">
                 Sell my Car
               </Link>
             </li>
@@ -56,7 +56,7 @@ export default function Footer() {
           <h3 className="text-lg font-semibold mb-4">Services</h3>
           <ul className="space-y-2 text-gray-400 text-sm">
             <li>
-              <Link href="/trade-in" className="hover:text-white">
+              <Link href="/auction" className="hover:text-white">
                 Trade-In
               </Link>
             </li>
@@ -66,7 +66,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/repairs" className="hover:text-white">
+              <Link href="/place-add" className="hover:text-white">
                 Sell your car
               </Link>
             </li>
@@ -79,7 +79,7 @@ export default function Footer() {
           <p className="text-gray-400 text-sm">
             123 Main Street, Addis Ababa, Ethiopia
           </p>
-          <p className="text-gray-400 text-sm">Email: info@drivexmotors.com</p>
+          <p className="text-gray-400 text-sm">Email: info@autodealer.com</p>
           <p className="text-gray-400 text-sm">Phone: +251 900 123 456</p>
 
           {/* Socials */}

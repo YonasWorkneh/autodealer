@@ -24,7 +24,6 @@ export default function CarMarketplace() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<any>(null);
   const { data: cars, isLoading } = useCars();
-  console.log(cars);
 
   return (
     <div className="min-h-screen bg-white">
@@ -51,7 +50,7 @@ export default function CarMarketplace() {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Search and Sort */}
-            <div className="sticky top-0 bg-white z-40 pb-4">
+            <div className="sticky top-0 bg-white z-[10000] pb-4">
               <Card className="border-gray-200 rounded-3xl shadow-none py-4">
                 <CardContent className="flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div className="relative w-full sm:flex-1">

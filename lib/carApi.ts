@@ -22,12 +22,7 @@ async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
 }
 
 export async function fetchCars(): Promise<FetchedCar[]> {
-  const credential = await getCredentials();
-  return fetcher<FetchedCar[]>("/inventory/cars/", {
-    headers: {
-      Authorization: `Bearer ${credential.access}`,
-    },
-  });
+  return fetcher<FetchedCar[]>("/inventory/cars/");
 }
 
 export async function fetchCarById(id: string): Promise<FetchedCar> {
@@ -40,24 +35,14 @@ export async function fetchCarById(id: string): Promise<FetchedCar> {
 }
 
 export async function fetchMakes(): Promise<Make[]> {
-  const credential = await getCredentials();
-  return fetcher<Make[]>("/inventory/makes/", {
-    headers: {
-      Authorization: `Bearer ${credential.access}`,
-    },
-  });
+  return fetcher<Make[]>("/inventory/makes/");
 }
 
 export async function fetchModels(makeId?: number): Promise<Model[]> {
-  const credential = await getCredentials();
   const url = makeId
     ? `/inventory/models/?make=${makeId}`
     : "/inventory/models/";
-  return fetcher<Model[]>(url, {
-    headers: {
-      Authorization: `Bearer ${credential.access}`,
-    },
-  });
+  return fetcher<Model[]>(url);
 }
 
 export async function postCar(formData: FormData): Promise<Car> {
@@ -100,7 +85,7 @@ export async function deleteCar(id: number) {
   return { success: true, id };
 }
 
-export async function updateCarViews(id: number) {
+export async function updateCarViews(car_id: number, ip_address: string) {
   const crednetial = await getCredentials();
   const res = await fetch(`${BASE_URL}/inventory/car-views/`, {
     method: "POST",
@@ -108,11 +93,9 @@ export async function updateCarViews(id: number) {
       Authorization: `Bearer ${crednetial.access}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ ip_address: "192.168.1.1" }),
+    body: JSON.stringify({ ip_address, car_id }),
   });
-  console.log(res);
   const data = await res.json();
-  console.log(data);
 }
 
 export async function makeCarFavorite(id: number) {
@@ -159,6 +142,17 @@ export async function removeCarFavorite(id: number) {
     });
     if (!res.ok) throw new Error("Error removing favorite car.");
     return { success: true, id };
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function getPopularCars() {
+  try {
+    const popularCars = await fetcher<FetchedCar[]>(
+     "/inventory/popular-cars/"
+    );
+    return popularCars;
   } catch (err) {
     throw err;
   }

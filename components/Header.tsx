@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useUserStore } from "@/store/user";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { useProfile } from "@/hooks/profile";
 
 interface HeaderProps {
   color?: string;
@@ -14,6 +15,7 @@ interface HeaderProps {
 
 export default function Header({ color }: HeaderProps) {
   const { user } = useUserStore();
+  const { data: profile } = useProfile();
   const [isOpen, setIsOpen] = useState(false);
 
   const linkClasses = (isBtn?: boolean) =>
@@ -69,7 +71,7 @@ export default function Header({ color }: HeaderProps) {
           href={user.email ? "profile" : "/signin"}
           className={linkClasses()}
         >
-          {user.email ? (
+          {user.email || profile?.first_name ? (
             <span
               className={`${
                 color === "black"
@@ -77,7 +79,7 @@ export default function Header({ color }: HeaderProps) {
                   : " bg-white/10 hover:bg-white/20"
               } size-10 flex justify-center items-center rounded-full uppercase`}
             >
-              {user.email[0]}
+              {profile?.first_name[0] || user.email[0]}
             </span>
           ) : (
             "Signin"
@@ -95,7 +97,8 @@ export default function Header({ color }: HeaderProps) {
               e.preventDefault();
               toast({
                 // title: "",
-                description: "❌   Log in or create an account to sell your car.",
+                description:
+                  "❌   Log in or create an account to sell your car.",
               });
             }
           }}

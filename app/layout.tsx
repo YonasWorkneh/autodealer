@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Session from "./Session";
 
 export const metadata: Metadata = {
-  title: "E-Car",
+  title: "Auto-Dealer",
 };
 
 export default function RootLayout({
@@ -14,17 +14,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   return (
     <html lang="en">
       <head>
-        <style>{`
-html {
-  font-family: ${GeistSans.style.fontFamily};
-  --font-sans: ${GeistSans.variable};
-  --font-mono: ${GeistMono.variable};
-}
-        `}</style>
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body>
