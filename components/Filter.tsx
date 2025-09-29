@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import {
@@ -12,22 +12,78 @@ import {
 import { useMakes, useModels } from "@/hooks/cars";
 import { Input } from "./ui/input";
 
-export default function FilterSidebar({ close }: { close?: () => void }) {
+type Filters = {
+  makeId?: number;
+  modelId?: number;
+  makeName?: string;
+  modelName?: string;
+  yearMin?: number;
+  yearMax?: number;
+  priceMin?: number;
+  priceMax?: number;
+  mileageMin?: number;
+  mileageMax?: number;
+};
+
+export default function FilterSidebar({
+  close,
+  initial,
+  onApply,
+  onClear,
+}: {
+  close?: () => void;
+  initial?: Filters;
+  onApply?: (filters: Filters) => void;
+  onClear?: () => void;
+}) {
   const { data: makes, isLoading: isMakesLoading } = useMakes();
-  const { data: models, isLoading: isModelsLoading } = useModels();
-  const [make, setMake] = useState<number>();
-  const [model, setModel] = useState<number>();
+  const [make, setMake] = useState<number | undefined>(initial?.makeId);
+  const { data: models, isLoading: isModelsLoading } = useModels(make);
+  const [model, setModel] = useState<number | undefined>(initial?.modelId);
+  const [yearMin, setYearMin] = useState<number | undefined>(initial?.yearMin);
+  const [yearMax, setYearMax] = useState<number | undefined>(initial?.yearMax);
+  const [priceMin, setPriceMin] = useState<number | undefined>(
+    initial?.priceMin
+  );
+  const [priceMax, setPriceMax] = useState<number | undefined>(
+    initial?.priceMax
+  );
+  const [mileageMin, setMileageMin] = useState<number | undefined>(
+    initial?.mileageMin
+  );
+  const [mileageMax, setMileageMax] = useState<number | undefined>(
+    initial?.mileageMax
+  );
+
+  // when make changes, clear model
+  useEffect(() => {
+    setModel(undefined);
+  }, [make]);
+
   return (
     <Card className="mb-6 sticky top-0 bg-white z-40 shadow-none">
       <CardContent className="p-4 sm:p-6 space-y-6">
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-white bg-zinc-900 hover:bg-zinc-800  w-full py-6 cursor-pointer text-white hover:text-white"
-          onClick={close}
-        >
-          Clear filters
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-gray-100 hover:bg-gray-200  w-full py-6 cursor-pointer"
+            onClick={() => {
+              setMake(undefined);
+              setModel(undefined);
+              setYearMin(undefined);
+              setYearMax(undefined);
+              setPriceMin(undefined);
+              setPriceMax(undefined);
+              setMileageMin(undefined);
+              setMileageMax(undefined);
+              onClear?.();
+              close?.();
+            }}
+          >
+            Clear filters
+          </Button>
+        </div>
 
         {/* Make & Model */}
         <div>
@@ -35,7 +91,10 @@ export default function FilterSidebar({ close }: { close?: () => void }) {
             Make & Model
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            <Select onValueChange={(value) => setMake(+value)}>
+            <Select
+              value={make?.toString()}
+              onValueChange={(value) => setMake(+value)}
+            >
               <SelectTrigger className="border-gray-300 w-full !h-[50px] !rounded-sm">
                 <SelectValue placeholder="Make" />
               </SelectTrigger>
@@ -55,6 +114,7 @@ export default function FilterSidebar({ close }: { close?: () => void }) {
             </Select>
             <Select
               disabled={make === undefined}
+              value={model?.toString()}
               onValueChange={(value) => setModel(+value)}
             >
               <SelectTrigger className="border-gray-300 w-full !h-[50px] !rounded-sm">
@@ -84,11 +144,23 @@ export default function FilterSidebar({ close }: { close?: () => void }) {
             <Input
               placeholder="1940"
               className="text-sm border-gray-300 h-[50px] rounded-sm w-full sm:flex-1"
+              value={yearMin?.toString() || ""}
+              onChange={(e) =>
+                setYearMin(
+                  e.target.value ? parseInt(e.target.value) : undefined
+                )
+              }
             />
             <span className="text-gray-500">to</span>
             <Input
               placeholder="2026"
               className="text-sm border-gray-300 h-[50px] rounded-sm w-full sm:flex-1"
+              value={yearMax?.toString() || ""}
+              onChange={(e) =>
+                setYearMax(
+                  e.target.value ? parseInt(e.target.value) : undefined
+                )
+              }
             />
           </div>
         </div>
@@ -100,11 +172,27 @@ export default function FilterSidebar({ close }: { close?: () => void }) {
             <Input
               placeholder="$0"
               className="text-sm border-gray-300 h-[50px] rounded-sm w-full sm:flex-1"
+              value={priceMin?.toString() || ""}
+              onChange={(e) =>
+                setPriceMin(
+                  e.target.value
+                    ? parseInt(e.target.value.replace(/[^0-9]/g, ""))
+                    : undefined
+                )
+              }
             />
             <span className="text-gray-500">to</span>
             <Input
               placeholder="$100,000+"
               className="text-sm border-gray-300 h-[50px] rounded-sm w-full sm:flex-1"
+              value={priceMax?.toString() || ""}
+              onChange={(e) =>
+                setPriceMax(
+                  e.target.value
+                    ? parseInt(e.target.value.replace(/[^0-9]/g, ""))
+                    : undefined
+                )
+              }
             />
           </div>
         </div>
@@ -116,14 +204,53 @@ export default function FilterSidebar({ close }: { close?: () => void }) {
             <Input
               placeholder="0 mi."
               className="text-sm border-gray-300 h-[50px] rounded-sm w-full sm:flex-1"
+              value={mileageMin?.toString() || ""}
+              onChange={(e) =>
+                setMileageMin(
+                  e.target.value
+                    ? parseInt(e.target.value.replace(/[^0-9]/g, ""))
+                    : undefined
+                )
+              }
             />
             <span className="text-gray-500">to</span>
             <Input
               placeholder="300,000+ mi."
               className="text-sm border-gray-300 h-[50px] rounded-sm w-full sm:flex-1"
+              value={mileageMax?.toString() || ""}
+              onChange={(e) =>
+                setMileageMax(
+                  e.target.value
+                    ? parseInt(e.target.value.replace(/[^0-9]/g, ""))
+                    : undefined
+                )
+              }
             />
           </div>
         </div>
+        <Button
+          size="sm"
+          className="w-full py-6 cursor-pointer"
+          onClick={() => {
+            const selectedMake = makes?.find((m: any) => m.id === make);
+            const selectedModel = models?.find((m: any) => m.id === model);
+            onApply?.({
+              makeId: make,
+              modelId: model,
+              makeName: selectedMake?.name,
+              modelName: selectedModel?.name,
+              yearMin,
+              yearMax,
+              priceMin,
+              priceMax,
+              mileageMin,
+              mileageMax,
+            });
+            close?.();
+          }}
+        >
+          Apply
+        </Button>
       </CardContent>
     </Card>
   );

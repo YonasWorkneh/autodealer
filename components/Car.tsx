@@ -14,9 +14,11 @@ import { formatPrice } from "@/lib/utils";
 export default function Car({
   setDetailOpened,
   car,
+  highlightQuery,
 }: {
   setDetailOpened: (status: boolean) => void;
   car: FetchedCar;
+  highlightQuery?: string;
 }) {
   const { data: favorites } = useCarFavorites();
   const { toast } = useToast();
@@ -50,6 +52,25 @@ export default function Car({
   // Get main image
   const mainImage = car.images?.[0]?.image_url || "/placeholder.svg";
 
+  const renderTitle = () => {
+    const title = `${car.year} ${car.make} ${car.model}`;
+    if (!highlightQuery) return title;
+    const q = highlightQuery.trim();
+    if (!q) return title;
+    const i = title.toLowerCase().indexOf(q.toLowerCase());
+    if (i === -1) return title;
+    const before = title.slice(0, i);
+    const match = title.slice(i, i + q.length);
+    const after = title.slice(i + q.length);
+    return (
+      <>
+        {before}
+        <span className="underline font-semibold">{match}</span>
+        {after}
+      </>
+    );
+  };
+
   return (
     <Link key={car.id} href={`/listing/${car.id}`} className="block relative">
       <Card className="shadow-none border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
@@ -81,7 +102,7 @@ export default function Car({
           {/* Details */}
           <div className="md:col-span-2 space-y-2">
             <h3 className="text-lg sm:text-xl font-semibold text-black">
-              {car.year} {car.make} {car.model}
+              {renderTitle()}
             </h3>
             <p className="text-gray-600 text-sm">
               {car.mileage?.toLocaleString()} miles

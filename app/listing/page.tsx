@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Search, Heart, MapPin, Filter, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,57 @@ export default function CarMarketplace() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<any>(null);
   const { data: cars, isLoading } = useCars();
+  const [query, setQuery] = useState("");
+  const [activeQuery, setActiveQuery] = useState("");
+  const [filters, setFilters] = useState<any>({});
+  const [showSuggest, setShowSuggest] = useState(false);
+
+  const normalized = (str: string) => str.toLowerCase();
+
+  const filteredCars = useMemo(() => {
+    const q = normalized(activeQuery);
+    return (cars || []).filter((c) => {
+      const matchesQuery = q
+        ? [c.make, c.model, c.body_type, String(c.year)]
+            .filter(Boolean)
+            .map((s) => normalized(String(s)))
+            .some((s) => s.includes(q))
+        : true;
+      if (!matchesQuery) return false;
+      if (
+        filters.makeName &&
+        normalized(c.make) !== normalized(filters.makeName)
+      )
+        return false;
+      if (
+        filters.modelName &&
+        normalized(c.model) !== normalized(filters.modelName)
+      )
+        return false;
+      if (filters.yearMin && c.year < filters.yearMin) return false;
+      if (filters.yearMax && c.year > filters.yearMax) return false;
+      if (filters.priceMin && c.price < filters.priceMin) return false;
+      if (filters.priceMax && c.price > filters.priceMax) return false;
+      if (filters.mileageMin && c.mileage < filters.mileageMin) return false;
+      if (filters.mileageMax && c.mileage > filters.mileageMax) return false;
+      return true;
+    });
+  }, [cars, activeQuery, filters]);
+
+  const suggestions = useMemo(() => {
+    const q = normalized(query).trim();
+    if (!q) return [] as { label: string; value: string }[];
+    const pool = new Map<string, string>();
+    (cars || []).forEach((c) => {
+      pool.set(`${c.make}`, c.make);
+      pool.set(`${c.make} ${c.model}`, `${c.make} ${c.model}`);
+      pool.set(`${c.model}`, c.model);
+    });
+    return Array.from(pool.values())
+      .filter((label) => normalized(label).includes(q))
+      .slice(0, 8)
+      .map((label) => ({ label, value: label }));
+  }, [cars, query]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -44,7 +95,11 @@ export default function CarMarketplace() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Filters - Desktop */}
           <div className="hidden lg:block lg:col-span-1">
-            <FilterSidebar />
+            <FilterSidebar
+              initial={filters}
+              onApply={(f) => setFilters(f)}
+              onClear={() => setFilters({})}
+            />
           </div>
 
           {/* Main Content */}
@@ -58,7 +113,50 @@ export default function CarMarketplace() {
                     <Input
                       placeholder="Search by make, model, or body style"
                       className="pl-10 h-12 text-lg border-none shadow-none focus:ring-0 focus:outline-none w-full focus-visible:ring-0"
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        setShowSuggest(true);
+                      }}
+                      onFocus={() => setShowSuggest(true)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          setActiveQuery(query.trim());
+                          setShowSuggest(false);
+                        }
+                      }}
                     />
+                    {showSuggest && suggestions.length > 0 && (
+                      <div className="absolute mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-[10001] max-h-80 overflow-auto">
+                        {suggestions.map((s) => {
+                          const idx = s.label
+                            .toLowerCase()
+                            .indexOf(query.toLowerCase());
+                          const before = s.label.slice(0, idx);
+                          const match = s.label.slice(idx, idx + query.length);
+                          const after = s.label.slice(idx + query.length);
+                          return (
+                            <button
+                              key={s.label}
+                              className="w-full text-left px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                              onClick={() => {
+                                setQuery(s.value);
+                                setActiveQuery(s.value);
+                                setShowSuggest(false);
+                              }}
+                            >
+                              <span className="text-gray-900">
+                                {before}
+                                <span className="font-semibold underline">
+                                  {match}
+                                </span>
+                                {after}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col sm:flex-row border-t pl-2 sm:border-t-0 sm:border-l border-gray-200 py-4 sm:py-0 justify-center items-center gap-2 sm:gap-4">
@@ -87,7 +185,7 @@ export default function CarMarketplace() {
             {/* Results Count */}
             <div className="mb-6">
               <h2 className="text-3xl font-bold text-black">
-                {cars?.length || 0}
+                {filteredCars.length}
               </h2>
               <p className="text-gray-600">vehicles found</p>
             </div>
@@ -114,8 +212,8 @@ export default function CarMarketplace() {
                     </div>
                   </div>
                 ))
-              ) : cars && cars.length > 0 ? (
-                cars.map((car) => (
+              ) : filteredCars && filteredCars.length > 0 ? (
+                filteredCars.map((car) => (
                   <Car
                     setDetailOpened={(status) => {
                       setDetailOpened(status);
@@ -125,6 +223,7 @@ export default function CarMarketplace() {
                     }}
                     car={car}
                     key={car.id}
+                    highlightQuery={activeQuery}
                   />
                 ))
               ) : (
@@ -147,7 +246,18 @@ export default function CarMarketplace() {
                 Close
               </Button>
             </div>
-            <FilterSidebar close={() => setFilterOpen(false)} />
+            <FilterSidebar
+              close={() => setFilterOpen(false)}
+              initial={filters}
+              onApply={(f) => {
+                setFilters(f);
+                setFilterOpen(false);
+              }}
+              onClear={() => {
+                setFilters({});
+                setFilterOpen(false);
+              }}
+            />
           </div>
         </div>
       )}
