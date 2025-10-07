@@ -3,6 +3,7 @@ import { Favorite } from "@/app/types/Favorite";
 import type { Make } from "@/app/types/Make";
 import type { Model } from "@/app/types/Model";
 import { getCredentials } from "./credential";
+import type { MarketData } from "@/app/types/Market";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
@@ -149,10 +150,21 @@ export async function removeCarFavorite(id: number) {
 
 export async function getPopularCars() {
   try {
-    const popularCars = await fetcher<FetchedCar[]>(
-     "/inventory/popular-cars/"
-    );
+    const popularCars = await fetcher<FetchedCar[]>("/inventory/popular-cars/");
     return popularCars;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function getMarketData() {
+  const credential = await getCredentials();
+  try {
+    return await fetcher<MarketData>("/inventory/cars/buyer-analytics", {
+      headers: {
+        Authorization: `Bearer ${credential.access}`,
+      },
+    });
   } catch (err) {
     throw err;
   }

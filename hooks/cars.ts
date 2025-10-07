@@ -11,6 +11,7 @@ import {
   carFavorites,
   removeCarFavorite,
   getPopularCars,
+  getMarketData,
 } from "@/lib/carApi";
 import type { FetchedCar } from "@/app/types/Car";
 
@@ -141,5 +142,12 @@ export function usePopularCars() {
   return useQuery({
     queryKey: ["popular-cars"],
     queryFn: getPopularCars,
+  });
+}
+
+export function useMarketData() {
+  return useQuery({
+    queryKey: ["market-data"],
+    queryFn: getMarketData,
   });
 }
