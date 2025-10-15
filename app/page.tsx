@@ -17,6 +17,103 @@ import { useEffect, useState } from "react";
 import { useMakes, useModels } from "@/hooks/cars";
 import { useRouter } from "next/navigation";
 
+// Featured Car Slider Component
+const FeaturedCarSlider = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const featuredCars = [
+    {
+      title: "BYD — SONG",
+      subtitle: "Electric • Smart Technology",
+      image: "/byd.png",
+    },
+    {
+      title: "VOLKSWAGEN — ID.6",
+      subtitle: "Electric SUV • Premium Interior",
+      image: "/id6-blue.png",
+    },
+    {
+      title: "TOYOTA — TACOMA",
+      subtitle: "Off-Road Pickup • 4x4 Capability",
+      image: "/tacoma.png",
+    },
+    {
+      title: "LUXURY — V8 POWER",
+      subtitle: "Premium SUV • Advanced Features",
+      image: "/v8-nobg.png",
+    },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % featuredCars.length);
+    }, 4000); // Change every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [featuredCars.length]);
+
+  return (
+    <div className="flex-1 flex flex-col gap-6">
+      <Card className="bg-white/10 backdrop-blur-sm border border-white/20 overflow-hidden">
+        <CardContent className="p-4 sm:p-6">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+          >
+            <h3 className="text-white text-xl font-semibold mb-2">
+              {featuredCars[currentIndex].title}
+            </h3>
+            <p className="text-white/70 text-sm mb-4">
+              {featuredCars[currentIndex].subtitle}
+            </p>
+          </motion.div>
+          <div className="w-full h-[200px] sm:h-[320px] relative">
+            <motion.div
+              key={`image-${currentIndex}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className="w-full h-full"
+            >
+              <Image
+                src={featuredCars[currentIndex].image}
+                alt={featuredCars[currentIndex].title}
+                fill
+                className="object-contain rounded"
+                priority={currentIndex === 0}
+              />
+            </motion.div>
+          </div>
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-4">
+            {featuredCars.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentIndex
+                    ? "bg-white w-8"
+                    : "bg-white/40 hover:bg-white/60"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <Link href="/listing">
+        <Button className="bg-white/10 hover:bg-white/20 border border-white/20 text-white w-full justify-between backdrop-blur-sm py-6">
+          <span>Explore Our Cars</span>
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      </Link>
+    </div>
+  );
+};
+
 export default function AutoDealerLanding() {
   const router = useRouter();
   const [filters, setFilters] = useState({
@@ -167,32 +264,7 @@ export default function AutoDealerLanding() {
             </motion.div>
 
             {/* Right Content */}
-            <div className="flex-1 flex flex-col gap-6">
-              <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
-                <CardContent className="p-4 sm:p-6">
-                  <h3 className="text-white text-xl font-semibold mb-2">
-                    BYD — SONG
-                  </h3>
-                  <p className="text-white/70 text-sm mb-4">
-                    Auto transmission • Full insurance
-                  </p>
-                  <div className="w-full h-[200px] sm:h-[320px] relative">
-                    <Image
-                      src="/byd.png"
-                      alt="BYD Song"
-                      fill
-                      className="object-cover rounded"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-              <Link href="/listing">
-                <Button className="bg-white/10 hover:bg-white/20 border border-white/20 text-white w-full justify-between backdrop-blur-sm py-6">
-                  <span>Explore Our Cars</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
+            <FeaturedCarSlider />
           </div>
 
           {/* Search / Filter Card */}
