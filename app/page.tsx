@@ -15,7 +15,6 @@ import SearchableDropdown from "@/components/SearchableDropdown";
 import RangeDropdown from "@/components/RangeDropdown";
 import { useEffect, useState } from "react";
 import { useMakes, useModels } from "@/hooks/cars";
-import Loading from "./loading";
 import { useRouter } from "next/navigation";
 
 export default function AutoDealerLanding() {
@@ -117,8 +116,6 @@ export default function AutoDealerLanding() {
     }
   }, [filters.make, refetch]);
 
-  if (isLoading) return <Loading />;
-
   return (
     <div className="relative">
       {/* Hero Section */}
@@ -206,19 +203,24 @@ export default function AutoDealerLanding() {
               </p>
               <div className="flex flex-col lg:flex-row flex-wrap lg:flex-nowrap gap-4">
                 <SearchableDropdown
-                  items={makes?.map((make) => {
-                    return { value: make.id, label: make.name };
-                  })}
-                  placeholder="Make"
+                  items={
+                    makes?.map((make) => {
+                      return { value: make.id, label: make.name };
+                    }) ?? []
+                  }
+                  placeholder={isLoading ? "Loading makes..." : "Make"}
                   value={filters.make}
                   onChange={(v) => handleChange("make", v)}
+                  className={isLoading ? "opacity-50 pointer-events-none" : ""}
                 />
                 <SearchableDropdown
                   items={
-                    models?.filter((model:any)=>model.make.id === filters.make)?.map((model:any) => ({
-                      value: model.id,
-                      label: model.name,
-                    })) ?? []
+                    models
+                      ?.filter((model: any) => model.make.id === filters.make)
+                      ?.map((model: any) => ({
+                        value: model.id,
+                        label: model.name,
+                      })) ?? []
                   }
                   placeholder="Model"
                   value={filters.model}

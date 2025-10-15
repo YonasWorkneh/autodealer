@@ -30,7 +30,6 @@ import type { Feature } from "../types/Car";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUserStore } from "@/store/user";
-import Loading from "../loading";
 import { useProfile } from "@/hooks/profile";
 
 // Validation schema
@@ -711,7 +710,7 @@ export default function PlaceAddForm() {
     if (!user.email) router.push("/signin");
   }, [user.email, router]);
 
-  if (!user.email || (c_id && isCarLoading)) return <Loading />;
+  if (!user.email) return null;
 
   return (
     <div>
@@ -724,747 +723,792 @@ export default function PlaceAddForm() {
             </h1>
           </div>
 
-          {/* Success Message */}
-          {(isPostSuccess || isUpdateSuccess) && submitSuccess && (
-            <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-green-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium">
-                    {c_id
-                      ? "Car updated successfully!"
-                      : "Form submitted successfully! Your car has been posted."}
-                  </p>
-                </div>
+          {/* Loading State for Edit Mode */}
+          {c_id && isCarLoading ? (
+            <div className="space-y-6 animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-6"></div>
+              <div className="space-y-4">
+                <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="h-32 bg-gray-200 rounded"></div>
               </div>
             </div>
-          )}
-
-          {/* Error Message */}
-          {submitError && (
-            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium">{submitError}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)}>
-            {step === 1 && (
-              <div className="space-y-6">
-                {/* Make Selection */}
-                <div className="space-y-2">
-                  <Label htmlFor="make" className="text-sm text-gray-500">
-                    Select Make
-                  </Label>
-                  <Controller
-                    name="make"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value ? field.value.toString() : ""}
-                        onValueChange={(value) => {
-                          field.onChange(Number(value));
-                          setValue("model", 0); // reset model when make changes
-                        }}
+          ) : (
+            <>
+              {/* Success Message */}
+              {(isPostSuccess || isUpdateSuccess) && submitSuccess && (
+                <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-green-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
                       >
-                        <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                            errors.make ? "border-red-500" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select Make" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {isMakesLoading ? (
-                            <SelectItem value="loading" disabled>
-                              Loading...
-                            </SelectItem>
-                          ) : (
-                            makes?.map((make: any) => (
-                              <SelectItem
-                                key={make.id}
-                                value={make.id.toString()}
-                              >
-                                {make.name}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.make && (
-                    <p className="text-red-500 text-sm">
-                      {errors.make.message}
-                    </p>
-                  )}
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium">
+                        {c_id
+                          ? "Car updated successfully!"
+                          : "Form submitted successfully! Your car has been posted."}
+                      </p>
+                    </div>
+                  </div>
                 </div>
+              )}
 
-                {/* Model Selection */}
-                <div className="space-y-2">
-                  <Label htmlFor="model" className="text-sm text-gray-500">
-                    Model
-                  </Label>
-                  <Controller
-                    name="model"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value ? field.value.toString() : ""}
-                        onValueChange={(value) => field.onChange(Number(value))}
-                        disabled={!watchedMake || watchedMake === 0}
+              {/* Error Message */}
+              {submitError && (
+                <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-red-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
                       >
-                        <SelectTrigger
-                          className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                            errors.model ? "border-red-500" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select Model" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {isModelsLoading ? (
-                            <SelectItem value="loading" disabled>
-                              Loading...
-                            </SelectItem>
-                          ) : (
-                            models
-                              ?.filter((model) => model.make.id === watchedMake)
-                              .map((model) => (
-                                <SelectItem
-                                  key={model.id}
-                                  value={model.id.toString()}
-                                >
-                                  {model.name}
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium">{submitError}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit(onSubmit)}>
+                {step === 1 && (
+                  <div className="space-y-6">
+                    {/* Make Selection */}
+                    <div className="space-y-2">
+                      <Label htmlFor="make" className="text-sm text-gray-500">
+                        Select Make
+                      </Label>
+                      <Controller
+                        name="make"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value ? field.value.toString() : ""}
+                            onValueChange={(value) => {
+                              field.onChange(Number(value));
+                              setValue("model", 0); // reset model when make changes
+                            }}
+                          >
+                            <SelectTrigger
+                              className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                errors.make ? "border-red-500" : ""
+                              }`}
+                            >
+                              <SelectValue placeholder="Select Make" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {isMakesLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading...
                                 </SelectItem>
-                              )) ?? null
-                          )}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.model && (
-                    <p className="text-red-500 text-sm">
-                      {errors.model.message}
-                    </p>
-                  )}
-                </div>
+                              ) : (
+                                makes?.map((make: any) => (
+                                  <SelectItem
+                                    key={make.id}
+                                    value={make.id.toString()}
+                                  >
+                                    {make.name}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.make && (
+                        <p className="text-red-500 text-sm">
+                          {errors.make.message}
+                        </p>
+                      )}
+                    </div>
 
-                {/* Year and Mileage Row */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="year" className="text-sm text-gray-500">
-                      Year
-                    </Label>
-                    <Controller
-                      name="year"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                              errors.year ? "border-red-500" : ""
-                            }`}
+                    {/* Model Selection */}
+                    <div className="space-y-2">
+                      <Label htmlFor="model" className="text-sm text-gray-500">
+                        Model
+                      </Label>
+                      <Controller
+                        name="model"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value ? field.value.toString() : ""}
+                            onValueChange={(value) =>
+                              field.onChange(Number(value))
+                            }
+                            disabled={!watchedMake || watchedMake === 0}
                           >
-                            <SelectValue placeholder="Select year" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {years.map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                            <SelectTrigger
+                              className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                errors.model ? "border-red-500" : ""
+                              }`}
+                            >
+                              <SelectValue placeholder="Select Model" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {isModelsLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading...
+                                </SelectItem>
+                              ) : (
+                                models
+                                  ?.filter(
+                                    (model) => model.make.id === watchedMake
+                                  )
+                                  .map((model) => (
+                                    <SelectItem
+                                      key={model.id}
+                                      value={model.id.toString()}
+                                    >
+                                      {model.name}
+                                    </SelectItem>
+                                  )) ?? null
+                              )}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.model && (
+                        <p className="text-red-500 text-sm">
+                          {errors.model.message}
+                        </p>
                       )}
-                    />
-                    {errors.year && (
-                      <p className="text-red-500 text-sm">
-                        {errors.year.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="mileage" className="text-sm text-gray-500">
-                      Mileage
-                    </Label>
-                    <Controller
-                      name="mileage"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="mileage"
-                          type="number"
-                          placeholder="50000"
-                          className={`h-12 border-black/10 rounded-md py-8 ${
-                            errors.mileage ? "border-red-500" : ""
-                          }`}
-                        />
-                      )}
-                    />
-                    {errors.mileage && (
-                      <p className="text-red-500 text-sm">
-                        {errors.mileage.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                    </div>
 
-                {/* Engine and Gearbox Row */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="engine" className="text-sm text-gray-500">
-                      Engine
-                    </Label>
-                    <Controller
-                      name="engine"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                              errors.engine ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select engine" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {engineTypes.map((engine) => (
-                              <SelectItem key={engine} value={engine}>
-                                {engine}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.engine && (
-                      <p className="text-red-500 text-sm">
-                        {errors.engine.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="gearbox" className="text-sm text-gray-500">
-                      Gearbox
-                    </Label>
-                    <Controller
-                      name="gearbox"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                              errors.gearbox ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select gearbox" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {gearboxTypes.map((gearbox) => (
-                              <SelectItem key={gearbox} value={gearbox}>
-                                {gearbox}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.gearbox && (
-                      <p className="text-red-500 text-sm">
-                        {errors.gearbox.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                {/* Fuel Type & Body Type */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fuel" className="text-sm text-gray-500">
-                      Fuel Type
-                    </Label>
-                    <Controller
-                      name="fuelType"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                              errors.fuelType ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select fuel type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {fuelTypes.map((fuel) => (
-                              <SelectItem key={fuel} value={fuel.toLowerCase()}>
-                                {fuel}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.fuelType && (
-                      <p className="text-red-500 text-sm">
-                        {errors.fuelType.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bodyType" className="text-sm text-gray-500">
-                      Body Type
-                    </Label>
-                    <Controller
-                      name="bodyType"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                              errors.bodyType ? "border-red-500" : ""
-                            }`}
-                          >
-                            <SelectValue placeholder="Select body type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {bodyTypes.map((bodyType) => (
-                              <SelectItem
-                                key={bodyType.label}
-                                value={bodyType.value}
+                    {/* Year and Mileage Row */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="year" className="text-sm text-gray-500">
+                          Year
+                        </Label>
+                        <Controller
+                          name="year"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                  errors.year ? "border-red-500" : ""
+                                }`}
                               >
-                                {bodyType.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.bodyType && (
-                      <p className="text-red-500 text-sm">
-                        {errors.bodyType.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Colors */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="bodyColor"
-                      className="text-sm text-gray-500"
-                    >
-                      Exterior Color
-                    </Label>
-                    <Controller
-                      name="bodyColor"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="bodyColor"
-                          type="text"
-                          placeholder="Grey"
-                          className={`h-12 border-black/10 rounded-md py-8 ${
-                            errors.bodyColor ? "border-red-500" : ""
-                          }`}
+                                <SelectValue placeholder="Select year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {years.map((year) => (
+                                  <SelectItem
+                                    key={year}
+                                    value={year.toString()}
+                                  >
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
                         />
-                      )}
-                    />
-                    {errors.bodyColor && (
-                      <p className="text-red-500 text-sm">
-                        {errors.bodyColor.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="interiorColor"
-                      className="text-sm text-gray-500"
-                    >
-                      Interior Color
-                    </Label>
-                    <Controller
-                      name="interiorColor"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="interiorColor"
-                          type="text"
-                          placeholder="White"
-                          className={`h-12 border-black/10 rounded-md py-8 ${
-                            errors.interiorColor ? "border-red-500" : ""
-                          }`}
-                        />
-                      )}
-                    />
-                    {errors.interiorColor && (
-                      <p className="text-red-500 text-sm">
-                        {errors.interiorColor.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Next Button */}
-                <div className="flex justify-end pt-8">
-                  <Button
-                    type="button"
-                    onClick={handleNext}
-                    className="px-8 py-3 bg-black hover:bg-gray-800 text-white rounded cursor-pointer"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6">
-                {/* Images Upload */}
-                <div className="space-y-3">
-                  <Label htmlFor="upload" className="text-sm text-gray-500">
-                    Uploads
-                  </Label>
-                  <p className="text-xs text-gray-400">
-                    Upload car images. Click the checkbox to mark the main image
-                    for your listing.
-                  </p>
-                  <div className="grid grid-cols-3 gap-4">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400">
-                      <Plus className="w-6 h-6 text-gray-500" />
-                      <span className="mt-1 text-sm text-gray-500">Add</span>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </label>
-                    {images.map((file, idx) => (
-                      <div
-                        key={idx}
-                        className="relative w-full h-32 rounded-lg overflow-hidden border"
-                      >
-                        <Image
-                          src={URL.createObjectURL(file)}
-                          alt="Car Image"
-                          fill
-                          className="object-cover"
-                        />
-                        {/* Featured Badge */}
-                        {idx === featuredImageIndex && (
-                          <Checkbox
-                            className="absolute top-1 left-1"
-                            checked={true}
-                          />
-                        )}
-                        {/* Remove Button */}
-                        <button
-                          type="button"
-                          onClick={() => removeImage(idx)}
-                          className="absolute top-1 right-1 bg-black/60 text-white rounded-full size-[20px] text-xs cursor-pointer hover:bg-black/70"
-                        >
-                          ✕
-                        </button>
-                        {/* Set as Featured Button */}
-                        {idx !== featuredImageIndex && (
-                          <Checkbox
-                            className="absolute top-1 left-1"
-                            checked={false}
-                            onCheckedChange={() => setFeaturedImage(idx)}
-                          />
+                        {errors.year && (
+                          <p className="text-red-500 text-sm">
+                            {errors.year.message}
+                          </p>
                         )}
                       </div>
-                    ))}
-                    {c_id &&
-                      carData?.images?.map((img: any, idx: number) => (
-                        <div
-                          key={`existing-${idx}`}
-                          className="relative w-full h-32 rounded-lg overflow-hidden border"
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="mileage"
+                          className="text-sm text-gray-500"
                         >
-                          <Image
-                            src={img.image_url}
-                            alt={img.caption || "Car Image"}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ))}
-                  </div>
-                  {errors.images && (
-                    <p className="text-red-500 text-sm">
-                      {errors.images.message}
-                    </p>
-                  )}
-                </div>
-                {/* Price + Sales Type */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="price" className="text-sm text-gray-500">
-                      Price
-                    </Label>
-                    <Controller
-                      name="price"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id="price"
-                          type="number"
-                          placeholder="Enter price"
-                          className={`h-12 border-black/10 rounded-md py-8 ${
-                            errors.price ? "border-red-500" : ""
-                          }`}
+                          Mileage
+                        </Label>
+                        <Controller
+                          name="mileage"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              id="mileage"
+                              type="number"
+                              placeholder="50000"
+                              className={`h-12 border-black/10 rounded-md py-8 ${
+                                errors.mileage ? "border-red-500" : ""
+                              }`}
+                            />
+                          )}
                         />
-                      )}
-                    />
-                    {errors.price && (
-                      <p className="text-red-500 text-sm">
-                        {errors.price.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="salesType"
-                      className="text-sm text-gray-500"
-                    >
-                      Sales Type
-                    </Label>
-                    <Controller
-                      name="salesType"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
+                        {errors.mileage && (
+                          <p className="text-red-500 text-sm">
+                            {errors.mileage.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Engine and Gearbox Row */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="engine"
+                          className="text-sm text-gray-500"
                         >
-                          <SelectTrigger
-                            className={`w-full h-12 border-black/10 rounded-md py-8 ${
-                              errors.salesType ? "border-red-500" : ""
+                          Engine
+                        </Label>
+                        <Controller
+                          name="engine"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                  errors.engine ? "border-red-500" : ""
+                                }`}
+                              >
+                                <SelectValue placeholder="Select engine" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {engineTypes.map((engine) => (
+                                  <SelectItem key={engine} value={engine}>
+                                    {engine}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.engine && (
+                          <p className="text-red-500 text-sm">
+                            {errors.engine.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="gearbox"
+                          className="text-sm text-gray-500"
+                        >
+                          Gearbox
+                        </Label>
+                        <Controller
+                          name="gearbox"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                  errors.gearbox ? "border-red-500" : ""
+                                }`}
+                              >
+                                <SelectValue placeholder="Select gearbox" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {gearboxTypes.map((gearbox) => (
+                                  <SelectItem key={gearbox} value={gearbox}>
+                                    {gearbox}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.gearbox && (
+                          <p className="text-red-500 text-sm">
+                            {errors.gearbox.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {/* Fuel Type & Body Type */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fuel" className="text-sm text-gray-500">
+                          Fuel Type
+                        </Label>
+                        <Controller
+                          name="fuelType"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                  errors.fuelType ? "border-red-500" : ""
+                                }`}
+                              >
+                                <SelectValue placeholder="Select fuel type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {fuelTypes.map((fuel) => (
+                                  <SelectItem
+                                    key={fuel}
+                                    value={fuel.toLowerCase()}
+                                  >
+                                    {fuel}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.fuelType && (
+                          <p className="text-red-500 text-sm">
+                            {errors.fuelType.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="bodyType"
+                          className="text-sm text-gray-500"
+                        >
+                          Body Type
+                        </Label>
+                        <Controller
+                          name="bodyType"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                  errors.bodyType ? "border-red-500" : ""
+                                }`}
+                              >
+                                <SelectValue placeholder="Select body type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {bodyTypes.map((bodyType) => (
+                                  <SelectItem
+                                    key={bodyType.label}
+                                    value={bodyType.value}
+                                  >
+                                    {bodyType.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.bodyType && (
+                          <p className="text-red-500 text-sm">
+                            {errors.bodyType.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Colors */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="bodyColor"
+                          className="text-sm text-gray-500"
+                        >
+                          Exterior Color
+                        </Label>
+                        <Controller
+                          name="bodyColor"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              id="bodyColor"
+                              type="text"
+                              placeholder="Grey"
+                              className={`h-12 border-black/10 rounded-md py-8 ${
+                                errors.bodyColor ? "border-red-500" : ""
+                              }`}
+                            />
+                          )}
+                        />
+                        {errors.bodyColor && (
+                          <p className="text-red-500 text-sm">
+                            {errors.bodyColor.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="interiorColor"
+                          className="text-sm text-gray-500"
+                        >
+                          Interior Color
+                        </Label>
+                        <Controller
+                          name="interiorColor"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              id="interiorColor"
+                              type="text"
+                              placeholder="White"
+                              className={`h-12 border-black/10 rounded-md py-8 ${
+                                errors.interiorColor ? "border-red-500" : ""
+                              }`}
+                            />
+                          )}
+                        />
+                        {errors.interiorColor && (
+                          <p className="text-red-500 text-sm">
+                            {errors.interiorColor.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Next Button */}
+                    <div className="flex justify-end pt-8">
+                      <Button
+                        type="button"
+                        onClick={handleNext}
+                        className="px-8 py-3 bg-black hover:bg-gray-800 text-white rounded cursor-pointer"
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-6">
+                    {/* Images Upload */}
+                    <div className="space-y-3">
+                      <Label htmlFor="upload" className="text-sm text-gray-500">
+                        Uploads
+                      </Label>
+                      <p className="text-xs text-gray-400">
+                        Upload car images. Click the checkbox to mark the main
+                        image for your listing.
+                      </p>
+                      <div className="grid grid-cols-3 gap-4">
+                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400">
+                          <Plus className="w-6 h-6 text-gray-500" />
+                          <span className="mt-1 text-sm text-gray-500">
+                            Add
+                          </span>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                        </label>
+                        {images.map((file, idx) => (
+                          <div
+                            key={idx}
+                            className="relative w-full h-32 rounded-lg overflow-hidden border"
+                          >
+                            <Image
+                              src={URL.createObjectURL(file)}
+                              alt="Car Image"
+                              fill
+                              className="object-cover"
+                            />
+                            {/* Featured Badge */}
+                            {idx === featuredImageIndex && (
+                              <Checkbox
+                                className="absolute top-1 left-1"
+                                checked={true}
+                              />
+                            )}
+                            {/* Remove Button */}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(idx)}
+                              className="absolute top-1 right-1 bg-black/60 text-white rounded-full size-[20px] text-xs cursor-pointer hover:bg-black/70"
+                            >
+                              ✕
+                            </button>
+                            {/* Set as Featured Button */}
+                            {idx !== featuredImageIndex && (
+                              <Checkbox
+                                className="absolute top-1 left-1"
+                                checked={false}
+                                onCheckedChange={() => setFeaturedImage(idx)}
+                              />
+                            )}
+                          </div>
+                        ))}
+                        {c_id &&
+                          carData?.images?.map((img: any, idx: number) => (
+                            <div
+                              key={`existing-${idx}`}
+                              className="relative w-full h-32 rounded-lg overflow-hidden border"
+                            >
+                              <Image
+                                src={img.image_url}
+                                alt={img.caption || "Car Image"}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          ))}
+                      </div>
+                      {errors.images && (
+                        <p className="text-red-500 text-sm">
+                          {errors.images.message}
+                        </p>
+                      )}
+                    </div>
+                    {/* Price + Sales Type */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="price"
+                          className="text-sm text-gray-500"
+                        >
+                          Price
+                        </Label>
+                        <Controller
+                          name="price"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              id="price"
+                              type="number"
+                              placeholder="Enter price"
+                              className={`h-12 border-black/10 rounded-md py-8 ${
+                                errors.price ? "border-red-500" : ""
+                              }`}
+                            />
+                          )}
+                        />
+                        {errors.price && (
+                          <p className="text-red-500 text-sm">
+                            {errors.price.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="salesType"
+                          className="text-sm text-gray-500"
+                        >
+                          Sales Type
+                        </Label>
+                        <Controller
+                          name="salesType"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger
+                                className={`w-full h-12 border-black/10 rounded-md py-8 ${
+                                  errors.salesType ? "border-red-500" : ""
+                                }`}
+                              >
+                                <SelectValue placeholder="Select sales type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {salesTypes.map((sale) => (
+                                  <SelectItem key={sale} value={sale}>
+                                    {sale}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.salesType && (
+                          <p className="text-red-500 text-sm">
+                            {errors.salesType.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="description"
+                        className="text-sm text-gray-500"
+                      >
+                        Description
+                      </Label>
+                      <Controller
+                        name="description"
+                        control={control}
+                        render={({ field }) => (
+                          <Textarea
+                            {...field}
+                            id="description"
+                            placeholder="Write a short description about your car..."
+                            className={`min-h-[120px] border-black/10 rounded-md ${
+                              errors.description ? "border-red-500" : ""
                             }`}
-                          >
-                            <SelectValue placeholder="Select sales type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {salesTypes.map((sale) => (
-                              <SelectItem key={sale} value={sale}>
-                                {sale}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {errors.salesType && (
-                      <p className="text-red-500 text-sm">
-                        {errors.salesType.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="description"
-                    className="text-sm text-gray-500"
-                  >
-                    Description
-                  </Label>
-                  <Controller
-                    name="description"
-                    control={control}
-                    render={({ field }) => (
-                      <Textarea
-                        {...field}
-                        id="description"
-                        placeholder="Write a short description about your car..."
-                        className={`min-h-[120px] border-black/10 rounded-md ${
-                          errors.description ? "border-red-500" : ""
-                        }`}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  {errors.description && (
-                    <p className="text-red-500 text-sm">
-                      {errors.description.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Features */}
-                <div className="space-y-6">
-                  {/* Technical Features Section */}
-                  <div className="border border-border rounded-lg">
-                    <div className="flex items-center justify-between p-4 border-b border-border">
-                      <h2 className="text-gray-500">Technical Features</h2>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setShowAllTechnical(!showAllTechnical);
-                        }}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        {showAllTechnical ? "Show less" : "Show more"}
-                        {showAllTechnical ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
+                      {errors.description && (
+                        <p className="text-red-500 text-sm">
+                          {errors.description.message}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {visibleTechnicalFeatures.map((feature) => (
-                          <div
-                            key={feature.id}
-                            className="flex items-center space-x-3"
+                    {/* Features */}
+                    <div className="space-y-6">
+                      {/* Technical Features Section */}
+                      <div className="border border-border rounded-lg">
+                        <div className="flex items-center justify-between p-4 border-b border-border">
+                          <h2 className="text-gray-500">Technical Features</h2>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowAllTechnical(!showAllTechnical);
+                            }}
+                            className="flex items-center gap-2 text-sm"
                           >
-                            <Checkbox
-                              id={feature.id}
-                              checked={feature.checked}
-                              onCheckedChange={(checked) =>
-                                handleTechnicalFeatureChange(
-                                  feature.id,
-                                  checked as boolean
-                                )
-                              }
-                              className="w-5 h-5 transition-all duration-200 cursor-pointer"
-                            />
-                            <label
-                              htmlFor={feature.id}
-                              className="text-foreground cursor-pointer select-none text-sm"
-                            >
-                              {feature.label}
-                            </label>
+                            {showAllTechnical ? "Show less" : "Show more"}
+                            {showAllTechnical ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+
+                        <div className="p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {visibleTechnicalFeatures.map((feature) => (
+                              <div
+                                key={feature.id}
+                                className="flex items-center space-x-3"
+                              >
+                                <Checkbox
+                                  id={feature.id}
+                                  checked={feature.checked}
+                                  onCheckedChange={(checked) =>
+                                    handleTechnicalFeatureChange(
+                                      feature.id,
+                                      checked as boolean
+                                    )
+                                  }
+                                  className="w-5 h-5 transition-all duration-200 cursor-pointer"
+                                />
+                                <label
+                                  htmlFor={feature.id}
+                                  className="text-foreground cursor-pointer select-none text-sm"
+                                >
+                                  {feature.label}
+                                </label>
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                        </div>
+                      </div>
+
+                      {/* Extras Section */}
+                      <div className="border border-border rounded-lg">
+                        <div className="flex items-center justify-between p-4 border-b border-border">
+                          <h2 className="text-gray-500">Extras</h2>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowAllExtras(!showAllExtras);
+                            }}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            {showAllExtras ? "Show less" : "Show more"}
+                            {showAllExtras ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+
+                        <div className="p-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {visibleExtras.map((extra) => (
+                              <div
+                                key={extra.id}
+                                className="flex items-center space-x-3"
+                              >
+                                <Checkbox
+                                  id={extra.id}
+                                  checked={extra.checked}
+                                  onCheckedChange={(checked) =>
+                                    handleExtraChange(
+                                      extra.id,
+                                      checked as boolean
+                                    )
+                                  }
+                                  className="w-5 h-5 transition-all duration-200 cursor-pointer"
+                                />
+                                <label
+                                  htmlFor={extra.id}
+                                  className="text-foreground cursor-pointer select-none text-sm"
+                                >
+                                  {extra.label}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Extras Section */}
-                  <div className="border border-border rounded-lg">
-                    <div className="flex items-center justify-between p-4 border-b border-border">
-                      <h2 className="text-gray-500">Extras</h2>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setShowAllExtras(!showAllExtras);
-                        }}
-                        className="flex items-center gap-2 text-sm"
+                    {/* Buttons */}
+                    <div className="flex justify-between pt-8">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setStep(1)}
+                        className="px-8 py-3 text-gray-600 hover:text-gray-800 cursor-pointer bg-gray-100 hover:bg-gray-200"
                       >
-                        {showAllExtras ? "Show less" : "Show more"}
-                        {showAllExtras ? (
-                          <ChevronUp className="w-4 h-4" />
+                        Back
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded min-w-[95px]"
+                        disabled={isPostPending || isUpdatePending}
+                      >
+                        {isPostPending || isUpdatePending ? (
+                          <Loader2 size={16} className="animate-spin" />
                         ) : (
-                          <ChevronDown className="w-4 h-4" />
+                          <p>{c_id ? "Update" : "Submit"}</p>
                         )}
-                      </button>
-                    </div>
-
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {visibleExtras.map((extra) => (
-                          <div
-                            key={extra.id}
-                            className="flex items-center space-x-3"
-                          >
-                            <Checkbox
-                              id={extra.id}
-                              checked={extra.checked}
-                              onCheckedChange={(checked) =>
-                                handleExtraChange(extra.id, checked as boolean)
-                              }
-                              className="w-5 h-5 transition-all duration-200 cursor-pointer"
-                            />
-                            <label
-                              htmlFor={extra.id}
-                              className="text-foreground cursor-pointer select-none text-sm"
-                            >
-                              {extra.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
+                      </Button>
                     </div>
                   </div>
-                </div>
-
-                {/* Buttons */}
-                <div className="flex justify-between pt-8">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setStep(1)}
-                    className="px-8 py-3 text-gray-600 hover:text-gray-800 cursor-pointer bg-gray-100 hover:bg-gray-200"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer rounded min-w-[95px]"
-                    disabled={isPostPending || isUpdatePending}
-                  >
-                    {isPostPending || isUpdatePending ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <p>{c_id ? "Update" : "Submit"}</p>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </form>
+                )}
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>

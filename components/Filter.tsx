@@ -60,6 +60,42 @@ export default function FilterSidebar({
     setModel(undefined);
   }, [make]);
 
+  // Apply filters immediately for dropdowns, with debounce for text inputs
+  useEffect(() => {
+    // Debounce for text inputs (year, price, mileage)
+    const timer = setTimeout(() => {
+      const selectedMake = makes?.find((m: any) => m.id === make);
+      const selectedModel = models?.find((m: any) => m.id === model);
+
+      onApply?.({
+        makeId: make,
+        modelId: model,
+        makeName: selectedMake?.name,
+        modelName: selectedModel?.name,
+        yearMin,
+        yearMax,
+        priceMin,
+        priceMax,
+        mileageMin,
+        mileageMax,
+      });
+    }, 500); // 500ms debounce for text inputs
+
+    return () => clearTimeout(timer);
+  }, [
+    make,
+    model,
+    yearMin,
+    yearMax,
+    priceMin,
+    priceMax,
+    mileageMin,
+    mileageMax,
+    makes,
+    models,
+    onApply,
+  ]);
+
   return (
     <Card className="mb-6 sticky top-0 bg-white z-40 shadow-none">
       <CardContent className="p-4 sm:p-6 space-y-6">
@@ -67,7 +103,7 @@ export default function FilterSidebar({
           <Button
             variant="outline"
             size="sm"
-            className="bg-gray-100 hover:bg-gray-200  w-full py-6 cursor-pointer"
+            className="bg-gray-100 hover:bg-gray-200 w-full py-6 cursor-pointer"
             onClick={() => {
               setMake(undefined);
               setModel(undefined);
@@ -78,7 +114,6 @@ export default function FilterSidebar({
               setMileageMin(undefined);
               setMileageMax(undefined);
               onClear?.();
-              close?.();
             }}
           >
             Clear filters
@@ -121,16 +156,21 @@ export default function FilterSidebar({
                 <SelectValue placeholder="Model" />
               </SelectTrigger>
               <SelectContent>
-                {models?.map((model: any) =>
-                  isModelsLoading ? (
-                    <SelectItem value={`loading`} disabled key={model.id}>
-                      loading...
-                    </SelectItem>
-                  ) : (
-                    <SelectItem value={`${model.id}`} key={model.id}>
-                      {model.name}
-                    </SelectItem>
-                  )
+                {isModelsLoading ? (
+                  <SelectItem value={`loading`} disabled>
+                    loading...
+                  </SelectItem>
+                ) : (
+                  models
+                    ?.filter(
+                      (model: any) =>
+                        model.make?.id === make || model.make_id === make
+                    )
+                    ?.map((model: any) => (
+                      <SelectItem value={`${model.id}`} key={model.id}>
+                        {model.name}
+                      </SelectItem>
+                    ))
                 )}
               </SelectContent>
             </Select>
@@ -249,7 +289,7 @@ export default function FilterSidebar({
             close?.();
           }}
         >
-          Apply
+          Apply Filters
         </Button>
       </CardContent>
     </Card>

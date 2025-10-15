@@ -28,12 +28,13 @@ export default function CarMarketplace() {
   const [activeQuery, setActiveQuery] = useState("");
   const [filters, setFilters] = useState<any>({});
   const [showSuggest, setShowSuggest] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("best");
 
   const normalized = (str: string) => str.toLowerCase();
 
   const filteredCars = useMemo(() => {
     const q = normalized(activeQuery);
-    return (cars || []).filter((c) => {
+    let filtered = (cars || []).filter((c) => {
       const matchesQuery = q
         ? [c.make, c.model, c.body_type, String(c.year)]
             .filter(Boolean)
@@ -59,7 +60,20 @@ export default function CarMarketplace() {
       if (filters.mileageMax && c.mileage > filters.mileageMax) return false;
       return true;
     });
-  }, [cars, activeQuery, filters]);
+
+    // Apply sorting
+    if (sortBy === "price-low") {
+      filtered = [...filtered].sort(
+        (a, b) => parseFloat(a.price) - parseFloat(b.price)
+      );
+    } else if (sortBy === "price-high") {
+      filtered = [...filtered].sort(
+        (a, b) => parseFloat(b.price) - parseFloat(a.price)
+      );
+    }
+
+    return filtered;
+  }, [cars, activeQuery, filters, sortBy]);
 
   const suggestions = useMemo(() => {
     const q = normalized(query).trim();
@@ -105,7 +119,7 @@ export default function CarMarketplace() {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Search and Sort */}
-            <div className="sticky top-0 bg-white z-[10000] pb-4">
+            <div className="sticky top-0 bg-white z-[100] pb-4">
               <Card className="border-gray-200 rounded-3xl shadow-none py-4">
                 <CardContent className="flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div className="relative w-full sm:flex-1">
@@ -127,7 +141,7 @@ export default function CarMarketplace() {
                       }}
                     />
                     {showSuggest && suggestions.length > 0 && (
-                      <div className="absolute mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-[10001] max-h-80 overflow-auto">
+                      <div className="absolute mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-[200] max-h-80 overflow-auto">
                         {suggestions.map((s) => {
                           const idx = s.label
                             .toLowerCase()
@@ -163,11 +177,11 @@ export default function CarMarketplace() {
                     <p className="font-bold text-xs text-center uppercase">
                       Sort By
                     </p>
-                    <Select>
+                    <Select value={sortBy} onValueChange={setSortBy}>
                       <SelectTrigger className="w-full sm:w-32 text-center border-none shadow-none focus:ring-0">
                         <SelectValue placeholder="Best match" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-[300]">
                         <SelectItem value="best">Best match</SelectItem>
                         <SelectItem value="price-low">
                           Price: Low to High
@@ -255,7 +269,6 @@ export default function CarMarketplace() {
               }}
               onClear={() => {
                 setFilters({});
-                setFilterOpen(false);
               }}
             />
           </div>
