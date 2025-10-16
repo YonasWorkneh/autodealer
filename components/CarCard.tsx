@@ -60,20 +60,14 @@ export default function CarCard({
     new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
 
   return (
-    <Link href={href} className="flex h-full flex-col cursor-pointer">
-      <div className="relative h-[190px] w-full">
-        {/* Watermark model name */}
-        <div className="absolute inset-0 flex items-start justify-center pt-6">
-          <div className="select-none text-4xl font-extrabold tracking-tight text-neutral-100/70 md:text-5xl">
-            {backgroundTitle}
-          </div>
-        </div>
+    <Link href={href} className="flex h-full flex-col cursor-pointer p-0">
+      <div className="relative h-[280px] w-full">
         {/* Car image */}
-        <div className="relative z-10 flex h-full items-end justify-center">
+        <div className="relative z-10 flex h-full w-full items-end justify-center">
           <img
             src={image || "/placeholder.svg"}
             alt={`${title} side view`}
-            className="w-full object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>

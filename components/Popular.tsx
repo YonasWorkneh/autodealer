@@ -23,7 +23,7 @@ export default function Popular() {
         {popularCars?.map((car) => (
           <Card
             key={car.id}
-            className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-sm"
+            className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-sm py-0"
           >
             <CarCard
               title={car.make + " " + car.model}
