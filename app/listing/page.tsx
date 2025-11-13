@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, Heart, MapPin, Filter, MoreVertical } from "lucide-react";
+import { Search, Filter, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,6 +29,7 @@ export default function CarMarketplace() {
   const [filters, setFilters] = useState<any>({});
   const [showSuggest, setShowSuggest] = useState(false);
   const [sortBy, setSortBy] = useState<string>("best");
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   const normalized = (str: string) => str.toLowerCase();
 
@@ -121,7 +122,7 @@ export default function CarMarketplace() {
             {/* Search and Sort */}
             <div className="sticky top-0 bg-white z-[100] pb-4">
               <Card className="border-gray-200 rounded-3xl shadow-none py-4">
-                <CardContent className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <CardContent className="flex flex-col sm:flex-row flex-wrap justify-between items-center gap-4">
                   <div className="relative w-full sm:flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <Input
@@ -173,24 +174,46 @@ export default function CarMarketplace() {
                     )}
                   </div>
 
-                  <div className="flex flex-col sm:flex-row border-t pl-2 sm:border-t-0 sm:border-l border-gray-200 py-4 sm:py-0 justify-center items-center gap-2 sm:gap-4">
-                    <p className="font-bold text-xs text-center uppercase">
-                      Sort By
-                    </p>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="w-full sm:w-32 text-center border-none shadow-none focus:ring-0">
-                        <SelectValue placeholder="Best match" />
-                      </SelectTrigger>
-                      <SelectContent className="z-[300]">
-                        <SelectItem value="best">Best match</SelectItem>
-                        <SelectItem value="price-low">
-                          Price: Low to High
-                        </SelectItem>
-                        <SelectItem value="price-high">
-                          Price: High to Low
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="flex flex-col sm:flex-row border-t sm:border-t-0 sm:border-l border-gray-200 py-4 sm:py-0 pl-0 sm:pl-4 justify-center items-center gap-4 w-full sm:w-auto">
+                    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                      <p className="font-bold text-xs text-center uppercase">
+                        Sort By
+                      </p>
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-full sm:w-32 text-center border-none shadow-none focus:ring-0">
+                          <SelectValue placeholder="Best match" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[300]">
+                          <SelectItem value="best">Best match</SelectItem>
+                          <SelectItem value="price-low">
+                            Price: Low to High
+                          </SelectItem>
+                          <SelectItem value="price-high">
+                            Price: High to Low
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={viewMode === "list" ? "default" : "ghost"}
+                        size="icon"
+                        className="rounded-full"
+                        onClick={() => setViewMode("list")}
+                        aria-label="List view"
+                      >
+                        <List className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant={viewMode === "grid" ? "default" : "ghost"}
+                        size="icon"
+                        className="rounded-full"
+                        onClick={() => setViewMode("grid")}
+                        aria-label="Grid view"
+                      >
+                        <LayoutGrid className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -205,7 +228,13 @@ export default function CarMarketplace() {
             </div>
 
             {/* Car Listings */}
-            <div className="space-y-4">
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"
+                  : "space-y-4"
+              }
+            >
               {isLoading ? (
                 // Loading skeleton
                 Array.from({ length: 6 }).map((_, index) => (
@@ -238,6 +267,7 @@ export default function CarMarketplace() {
                     car={car}
                     key={car.id}
                     highlightQuery={activeQuery}
+                    variant={viewMode}
                   />
                 ))
               ) : (

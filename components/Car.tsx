@@ -15,10 +15,12 @@ export default function Car({
   setDetailOpened,
   car,
   highlightQuery,
+  variant = "list",
 }: {
   setDetailOpened: (status: boolean) => void;
   car: FetchedCar;
   highlightQuery?: string;
+  variant?: "list" | "grid";
 }) {
   const { data: favorites } = useCarFavorites();
   const { toast } = useToast();
@@ -70,6 +72,78 @@ export default function Car({
       </>
     );
   };
+
+  if (variant === "grid") {
+    return (
+      <Link key={car.id} href={`/listing/${car.id}`} className="block h-full">
+        <Card className="shadow-none border-gray-200 hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
+          <CardContent className="p-4 sm:p-6 flex flex-col gap-4 h-full">
+            <div className="relative">
+              <img
+                src={mainImage}
+                alt={`${car.year} ${car.make} ${car.model}`}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 bg-white/80 hover:bg-white cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  mutate(car.id);
+                }}
+              >
+                <Heart
+                  className="h-4 w-4"
+                  fill={favorited !== -1 ? "black" : "none"}
+                />
+              </Button>
+            </div>
+            <div className="space-y-2 flex-1">
+              <h3 className="text-lg sm:text-xl font-semibold text-black">
+                {renderTitle()}
+              </h3>
+              <p className="text-gray-600 text-sm">
+                {car.mileage?.toLocaleString()} miles
+              </p>
+              <p className="text-gray-600 text-sm capitalize">{car.body_type}</p>
+              <Badge
+                variant="secondary"
+                className={`${
+                  car.status === "available"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {car.status}
+              </Badge>
+            </div>
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="text-xl sm:text-2xl font-bold">{formattedPrice}</p>
+                <p className="text-sm text-gray-600 capitalize">
+                  {car.sale_type}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="border border-gray-200 hover:bg-gray-100"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDetailOpened(true);
+                }}
+              >
+                Quick view
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+    );
+  }
 
   return (
     <Link key={car.id} href={`/listing/${car.id}`} className="block relative">
