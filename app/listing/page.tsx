@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Filter, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ import { CarDetailModal } from "./CarDetailModal";
 import FilterSidebar from "@/components/Filter";
 import Car from "@/components/Car";
 import { useCars } from "@/hooks/cars";
+import Pagination from "@/components/Pagination";
 
 export default function CarMarketplace() {
   const [detailOpened, setDetailOpened] = useState(false);
@@ -30,6 +31,8 @@ export default function CarMarketplace() {
   const [showSuggest, setShowSuggest] = useState(false);
   const [sortBy, setSortBy] = useState<string>("best");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
   const normalized = (str: string) => str.toLowerCase();
 
@@ -91,6 +94,26 @@ export default function CarMarketplace() {
       .map((label) => ({ label, value: label }));
   }, [cars, query]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeQuery, JSON.stringify(filters), sortBy, viewMode]);
+
+  const totalCars = filteredCars.length;
+  const totalPages = Math.max(1, Math.ceil(totalCars / itemsPerPage));
+  const currentPageSafe = Math.min(currentPage, totalPages);
+  const startIndex = totalCars === 0 ? 0 : (currentPageSafe - 1) * itemsPerPage;
+  const endIndex =
+    totalCars === 0 ? 0 : Math.min(startIndex + itemsPerPage, totalCars);
+  const paginatedCars = filteredCars.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    const next = Math.min(Math.max(page, 1), totalPages);
+    setCurrentPage(next);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header color="black" />
@@ -118,7 +141,7 @@ export default function CarMarketplace() {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-6 pb-10">
             {/* Search and Sort */}
             <div className="sticky top-0 bg-white z-[100] pb-4">
               <Card className="border-gray-200 rounded-3xl shadow-none py-4">
@@ -221,10 +244,16 @@ export default function CarMarketplace() {
 
             {/* Results Count */}
             <div className="mb-6">
-              <h2 className="text-3xl font-bold text-black">
-                {filteredCars.length}
+              <h2 className="text-3xl font-semibold text-[#1a1a1a]">
+                All Vehicles
               </h2>
-              <p className="text-gray-600">vehicles found</p>
+              <p className="mt-2 text-xs uppercase tracking-[0.25em] text-[#4a4a4a]">
+                {totalCars === 0
+                  ? "Showing 0 entries"
+                  : `Showing ${
+                      startIndex + 1
+                    } - ${endIndex} entries of ${totalCars}`}
+              </p>
             </div>
 
             {/* Car Listings */}
@@ -256,7 +285,7 @@ export default function CarMarketplace() {
                   </div>
                 ))
               ) : filteredCars && filteredCars.length > 0 ? (
-                filteredCars.map((car) => (
+                paginatedCars.map((car) => (
                   <Car
                     setDetailOpened={(status) => {
                       setDetailOpened(status);
@@ -275,6 +304,15 @@ export default function CarMarketplace() {
                   <p className="text-gray-500 text-lg">No cars found</p>
                 </div>
               )}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex justify-center border-t border-gray-200 pt-6">
+              <Pagination
+                currentPage={currentPageSafe}
+                totalPages={totalPages}
+                onPageChange={goToPage}
+              />
             </div>
           </div>
         </div>
